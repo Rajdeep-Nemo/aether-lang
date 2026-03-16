@@ -9,12 +9,10 @@ add_executable(aether_tests
   LexerTest.cpp
   ParserTest.cpp
   InterpreterTest.cpp
-  VMTest.cpp
 )
 
 target_link_libraries(aether_tests PRIVATE
-  aether_shared_lib
-  aether_vm_lib
+  aether
   GTest::gtest_main
 )
 

@@ -4,7 +4,7 @@
 #include "token.hpp"
 
 // Function to initialize our scanner
-void init_scanner(const char* source);
+void init_scanner(std::string src);
 // Function that checks if we read the complete file or not
 bool is_at_end();
 // Function that moves the pointer 'current' forward
@@ -20,7 +20,7 @@ Token create_token(TokenType token_type);
 // Function for error reporting
 Token error_token(const char* message);
 // Function to read input file into a buffer
-char *read_file(const char *path);
+std::string read_file(const char *path);
 // Helper function to evaluate conditional advances - '!=' , '=='
 bool match(char expected);
 // Helper function to check if it is a number literal
@@ -32,6 +32,9 @@ TokenType check_keyword(int start ,int length , const char* rest ,TokenType type
 // Function to evaluate tokens
 Token scan_token();
 // Function to manage the process
-void run_file(const char* path);
+bool run_file(const char* path);
+// Checks the next token without consuming the current one
+Token peek_token();
+
 
 #endif

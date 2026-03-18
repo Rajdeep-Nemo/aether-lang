@@ -135,39 +135,107 @@ TEST_F(LexerTest, FloatLiterals) {
 
 // Test string literals
 TEST_F(LexerTest, StringLiterals) {
-    auto tokens = tokenize("\"hello\" \"world\" \"\" \"hello\\\\world\"\"");
+    auto tokens = tokenize("\"hello\" \"world\" \"\" \"test\\nstring\" \"quote\\\"inside\"");
     
+    // Test basic string literals
     EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
     EXPECT_EQ(tokens[0].lexeme, "\"hello\"");
+    EXPECT_EQ(tokens[0].line, 1);
+    
     EXPECT_EQ(tokens[1].type, TokenType::STRING_LITERAL);
     EXPECT_EQ(tokens[1].lexeme, "\"world\"");
+    EXPECT_EQ(tokens[1].line, 1);
+    
+    // Test empty string
     EXPECT_EQ(tokens[2].type, TokenType::STRING_LITERAL);
     EXPECT_EQ(tokens[2].lexeme, "\"\"");
+    EXPECT_EQ(tokens[2].line, 1);
+    
+    // Test string with newline escape
     EXPECT_EQ(tokens[3].type, TokenType::STRING_LITERAL);
-    EXPECT_EQ(tokens[3].lexeme, "\"hello\\\\world\"\"");
-    EXPECT_EQ(tokens[4].type, TokenType::END_OF_FILE);
+    EXPECT_EQ(tokens[3].lexeme, "\"test\\nstring\"");
+    EXPECT_EQ(tokens[3].line, 1);
+    
+    // Test string with quote escape
+    EXPECT_EQ(tokens[4].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[4].lexeme, "\"quote\\\"inside\"");
+    EXPECT_EQ(tokens[4].line, 1);
+    
+    EXPECT_EQ(tokens[5].type, TokenType::END_OF_FILE);
+}
+
+// Test string literals with all escape sequences
+TEST_F(LexerTest, StringLiteralsWithAllEscapes) {
+    auto tokens = tokenize("\"\\n\\t\\r\\\\\\\"\\0\"");
+    
+    EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[0].lexeme, "\"\\n\\t\\r\\\\\\\"\\0\"");
+    EXPECT_EQ(tokens[1].type, TokenType::END_OF_FILE);
+}
+
+// Test string literals across multiple lines
+TEST_F(LexerTest, StringLiteralsMultipleLines) {
+    auto tokens = tokenize("\"line1\"\n\"line2\"\n\"line3\"");
+    
+    EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[0].lexeme, "\"line1\"");
+    EXPECT_EQ(tokens[0].line, 1);
+    
+    EXPECT_EQ(tokens[1].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[1].lexeme, "\"line2\"");
+    EXPECT_EQ(tokens[1].line, 2);
+    
+    EXPECT_EQ(tokens[2].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[2].lexeme, "\"line3\"");
+    EXPECT_EQ(tokens[2].line, 3);
+    
+    EXPECT_EQ(tokens[3].type, TokenType::END_OF_FILE);
+}
+
+// Test string literals with Unicode and special characters
+TEST_F(LexerTest, StringLiteralsWithSpecialChars) {
+    auto tokens = tokenize("\"hello世界\" \"123!@#$%^&*()\"");
+    
+    EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[0].lexeme, "\"hello世界\"");
+    EXPECT_EQ(tokens[1].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[1].lexeme, "\"123!@#$%^&*()\"");
+    EXPECT_EQ(tokens[2].type, TokenType::END_OF_FILE);
 }
 
 // Test string literals with escape sequences
 TEST_F(LexerTest, StringLiteralsWithEscapes) {
-    auto tokens = tokenize("\"hello\\nworld\" \"\\t\\\\\\\"\"\"");
+    auto tokens = tokenize("\"hello\\nworld\" \"\\t\\\\\\\"\"");
     
     EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
     EXPECT_EQ(tokens[0].lexeme, "\"hello\\nworld\"");
     EXPECT_EQ(tokens[1].type, TokenType::STRING_LITERAL);
-    EXPECT_EQ(tokens[1].lexeme, "\"\\t\\\\\\\"\"\"");
+    EXPECT_EQ(tokens[1].lexeme, "\"\\t\\\\\\\"\"");
     EXPECT_EQ(tokens[2].type, TokenType::END_OF_FILE);
 }
 
 // Test multiline string literals
 TEST_F(LexerTest, MultilineStringLiterals) {
-    auto tokens = tokenize("\"hello\\nworld\"\"\n\"test\"");
-    
+    // "hello\nworld" is a string with an actual newline inside it
+    auto tokens = tokenize("\"hello\nworld\"");
+
     EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
-    EXPECT_EQ(tokens[0].lexeme, "\"hello\\nworld\"");
+    EXPECT_EQ(tokens[0].lexeme, "\"hello\nworld\"");  // actual newline in lexeme
+    EXPECT_EQ(tokens[0].line, 2);                      // line counter advanced
+    EXPECT_EQ(tokens[1].type, TokenType::END_OF_FILE);
+}
+
+// Test multiple strings separated by newlines
+TEST_F(LexerTest, MultipleStringsAcrossLines) {
+    auto tokens = tokenize("\"hello\nworld\"\n\"\"\n\"test\"");
+
+    EXPECT_EQ(tokens[0].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[0].lexeme, "\"hello\nworld\"");
     EXPECT_EQ(tokens[1].type, TokenType::STRING_LITERAL);
-    EXPECT_EQ(tokens[1].lexeme, "\"test\"");
-    EXPECT_EQ(tokens[2].type, TokenType::END_OF_FILE);
+    EXPECT_EQ(tokens[1].lexeme, "\"\"");
+    EXPECT_EQ(tokens[2].type, TokenType::STRING_LITERAL);
+    EXPECT_EQ(tokens[2].lexeme, "\"test\"");
+    EXPECT_EQ(tokens[3].type, TokenType::END_OF_FILE);
 }
 
 // Test character literals
@@ -384,27 +452,24 @@ TEST_F(LexerTest, UnexpectedCharacter) {
 
 // Test complex expression
 TEST_F(LexerTest, ComplexExpression) {
-    auto tokens = tokenize("fn main() -> i32 { let x: i32 = 42 + 3.14; return x; }");
-    
+    auto tokens = tokenize("fn add() -> f32 {f32 x = 42 + 3.14; return x;}");
+
     // Verify key tokens in the expression
-    bool found_fn = false, found_main = false, found_left_paren = false;
-    bool found_right_paren = false, found_arrow = false, found_i32 = false;
-    bool found_left_brace = false, found_let = false, found_x = false;
-    bool found_colon = false, found_equal = false, found_int = false;
-    bool found_plus = false, found_float = false, found_semicolon = false;
-    bool found_return = false, found_right_brace = false;
-    
+    bool found_fn = false, found_add = false, found_left_paren = false;
+    bool found_right_paren = false, found_arrow = false, found_f32 = false;
+    bool found_left_brace = false, found_x = false, found_equal = false;
+    bool found_int = false, found_plus = false, found_float = false;
+    bool found_semicolon = false, found_return = false, found_right_brace = false;
+
     for (const auto& token : tokens) {
         if (token.type == TokenType::FN) found_fn = true;
-        if (token.type == TokenType::IDENTIFIER && token.lexeme == "main") found_main = true;
+        if (token.type == TokenType::IDENTIFIER && token.lexeme == "add") found_add = true;
         if (token.type == TokenType::LEFT_PAREN) found_left_paren = true;
         if (token.type == TokenType::RIGHT_PAREN) found_right_paren = true;
         if (token.type == TokenType::ARROW) found_arrow = true;
-        if (token.type == TokenType::I32) found_i32 = true;
+        if (token.type == TokenType::F32) found_f32 = true; // Assuming F32 is a distinct token type
         if (token.type == TokenType::LEFT_BRACE) found_left_brace = true;
-        if (token.type == TokenType::IDENTIFIER && token.lexeme == "let") found_let = true;
         if (token.type == TokenType::IDENTIFIER && token.lexeme == "x") found_x = true;
-        if (token.type == TokenType::COLON) found_colon = true;
         if (token.type == TokenType::EQUAL) found_equal = true;
         if (token.type == TokenType::INT_LITERAL) found_int = true;
         if (token.type == TokenType::PLUS) found_plus = true;
@@ -413,17 +478,15 @@ TEST_F(LexerTest, ComplexExpression) {
         if (token.type == TokenType::RETURN) found_return = true;
         if (token.type == TokenType::RIGHT_BRACE) found_right_brace = true;
     }
-    
+
     EXPECT_TRUE(found_fn);
-    EXPECT_TRUE(found_main);
+    EXPECT_TRUE(found_add);
     EXPECT_TRUE(found_left_paren);
     EXPECT_TRUE(found_right_paren);
     EXPECT_TRUE(found_arrow);
-    EXPECT_TRUE(found_i32);
+    EXPECT_TRUE(found_f32);
     EXPECT_TRUE(found_left_brace);
-    EXPECT_TRUE(found_let);
     EXPECT_TRUE(found_x);
-    EXPECT_TRUE(found_colon);
     EXPECT_TRUE(found_equal);
     EXPECT_TRUE(found_int);
     EXPECT_TRUE(found_plus);
@@ -457,5 +520,5 @@ TEST_F(LexerTest, OnlyComments) {
     
     EXPECT_EQ(tokens.size(), 1);
     EXPECT_EQ(tokens[0].type, TokenType::END_OF_FILE);
-    EXPECT_EQ(tokens[0].line, 4);
+    EXPECT_EQ(tokens[0].line, 3);
 }

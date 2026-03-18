@@ -5,9 +5,8 @@ project(aether-lang)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add source files
-set(AETHER_SOURCES
-    src/main.cpp
+# Add library source files (excluding main.cpp)
+set(AETHER_LIB_SOURCES
     src/AST/ast.cpp
     src/Builtins/builtin.cpp
     src/Interpreter/interpreter.cpp
@@ -17,6 +16,11 @@ set(AETHER_SOURCES
     src/Runtime/object.cpp
     src/Runtime/value.cpp
     src/Util/error.cpp
+)
+
+# Add main executable source
+set(AETHER_MAIN_SOURCES
+    src/main.cpp
 )
 
 # Add header include directories
@@ -31,10 +35,19 @@ set(AETHER_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Util
 )
 
-# Create the executable
-add_executable(aether ${AETHER_SOURCES})
+# Create static library
+add_library(aether_lib STATIC ${AETHER_LIB_SOURCES})
 
-# Add include directories
+# Create the executable
+add_executable(aether ${AETHER_MAIN_SOURCES})
+
+# Link executable to library
+target_link_libraries(aether PRIVATE aether_lib)
+
+# Add include directories for library
+target_include_directories(aether_lib PUBLIC ${AETHER_INCLUDE_DIRS})
+
+# Add include directories for executable
 target_include_directories(aether PRIVATE ${AETHER_INCLUDE_DIRS})
 
 # Set compiler flags for better error reporting

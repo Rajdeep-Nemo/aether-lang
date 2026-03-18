@@ -10,6 +10,7 @@ static constexpr char empty[] = "";
 // struct to iterate through the source code
 struct Scanner
 {
+    std::string source;
     const char* start = empty;
     const char* current = empty;
     std::size_t line{};
@@ -17,11 +18,11 @@ struct Scanner
 // Instance created
 static Scanner scanner;
 // Function to initialize our scanner
-void init_scanner(const char* source)
+void init_scanner(std::string src)
 {
-    assert(source != nullptr);
-    scanner.start = source;
-    scanner.current = source;
+    scanner.source = std::move(src);
+    scanner.start = scanner.source.c_str();
+    scanner.current = scanner.source.c_str();
     scanner.line = 1;
 }
 // Function that checks if we read the complete file or not
@@ -97,7 +98,7 @@ Token create_token(const TokenType token_type)
 {
     Token token;
     token.type = token_type;
-    token.lexeme = std::string_view(scanner.start , scanner.current - scanner.start);
+    token.lexeme = std::string(scanner.start , scanner.current - scanner.start);
     token.line = scanner.line;
     return token;
 }
@@ -106,12 +107,12 @@ Token error_token(const char* message)
 {
     Token token;
     token.type = TokenType::ERROR_TOKEN;
-    token.lexeme = message;
+    token.lexeme = std::string(message);
     token.line = scanner.line;
     return token;
 }
 // Function to read input file into a buffer
-char *read_file(const char *path)
+std::string read_file(const char *path)
 {
     // Opens the file
     std::ifstream file(path , std::ios::binary | std::ios::ate);
@@ -131,21 +132,16 @@ char *read_file(const char *path)
         std::cerr << "Could not determine size of file " << path << '\n';
         std::exit(1);
     }
-    //Allocate memory for the buffer (+1 for the NULL terminator)
-    auto buffer = std::make_unique<char[]>(file_size + 1);
-    const auto raw_buffer = buffer.get();
-    //Read bytes into the buffer
-    file.read(raw_buffer , file_size);
-    //Checks if reading was successful
-    if (file.gcount() < file_size)
-    {
+    // Buffer to store the file contents
+    std::string buffer(file_size, '\0');
+    file.read(buffer.data(), file_size);
+    // Checks if reading was successful
+    if (file.gcount() < file_size) {
         std::cerr << "Could not read file " << path << '\n';
         std::exit(1);
     }
-    //Null terminate the string
-    raw_buffer[file_size] = '\0';
-    //Cleanup and return
-    return buffer.release();
+    // Returns the buffer
+    return buffer;
 }
 // Helper function to evaluate conditional advances - '!=' , '=='
 bool match(const char expected)
@@ -224,9 +220,10 @@ static Token is_string_literal()
         if (peek() == '\n')
         {
             scanner.line++;
+            advance();
         }
         // To check escape sequence
-        if (peek() == '\\')
+        else if (peek() == '\\')
         {
             advance();
             if (is_at_end())
@@ -524,36 +521,29 @@ Token scan_token()
         return error_token("Unexpected character.");
     }
 }
-// Function to manage the process
-void run_file(const char* path)
+// Checks the next token without consuming the current one
+Token peek_token()
 {
-    //Read the file into source
-    const char* source = read_file(path);
-    //Initialize the scanner with the source
-    init_scanner(source);
-    delete[] source;
-}
+    const char* saved_start   = scanner.start;
+    const char* saved_current = scanner.current;
+    std::size_t saved_line    = scanner.line;
 
-int main(const int argc , char *argv[])
+    Token t = scan_token();
+
+    scanner.start   = saved_start;
+    scanner.current = saved_current;
+    scanner.line    = saved_line;
+
+    return t;
+}
+// Function to manage the process
+bool run_file(const char* path)
 {
-    if (argc == 1)
-    {
-        std::cout << "No input file provided.\n";
-        std::cout << std::format("Usage: {} <file.lk>\n", argv[0]);
-        std::cout << "Program terminated.\n";
-        return 1;
+    std::ifstream test(path);
+    if (!test) {
+        std::cerr << "File not found: " << path << '\n';
+        return false;
     }
-    if (argc == 2)
-    {
-        run_file(argv[1]);
-        return 0;
-    }
-    if (argc > 2)
-    {
-        std::cout << "Too many arguments.\n";
-        std::cout << std::format("Usage: {} <file.lk>\n", argv[0]);
-        std::cout << "Program terminated.\n";
-        return 1;
-    }
-    return 0;
+    init_scanner(read_file(path));
+    return true;
 }

@@ -1,7 +1,9 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
-#include <string_view>
+#include <cstddef>
+#include <string>
+
 // Enum to hold all the token types
 enum class TokenType
 {
@@ -44,7 +46,7 @@ enum class TokenType
 struct Token
 {
     TokenType type;
-    std::string_view lexeme;
+    std::string lexeme;
     std::size_t line;
 };
 

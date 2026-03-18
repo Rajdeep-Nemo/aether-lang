@@ -12,7 +12,7 @@ add_executable(aether_tests
 )
 
 target_link_libraries(aether_tests PRIVATE
-  aether
+  aether_lib
   GTest::gtest_main
 )
 
@@ -20,5 +20,5 @@ target_include_directories(aether_tests PRIVATE
   ${CMAKE_SOURCE_DIR}/src
 )
 
-include(GoogleTest)
-gtest_discover_tests(aether_tests)
+# include(GoogleTest)
+# gtest_discover_tests(aether_tests)

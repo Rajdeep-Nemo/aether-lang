@@ -24,32 +24,98 @@ Aether is a custom programming language interpreter implemented in C++.
 ### Building the Project
 1. Clone or navigate to the project directory.
 2. Create a build directory:
-   ```
+   ```bash
    mkdir build
    cd build
    ```
 3. Configure the project with CMake:
-   ```
+   ```bash
    cmake ..
    ```
-4. Build the executable:
-   ```
+4. Build the executable and tests:
+   ```bash
    make
    ```
    (On Windows, use `cmake --build .` instead of `make`.)
 
 5. Run the interpreter:
-   ```
-   ./aether
+   ```bash
+   ./aether <file.aether>
    ```
 
 ### Running Tests
-To build and run the tests:
-1. After building, run:
-   ```
-   ctest
-   ```
-   Or manually run the test executables in the build/tests/ directory.
+
+#### Quick Test Run
+To run all tests:
+```bash
+./tests/aether_tests
+```
+
+#### Running Specific Test Suites
+
+**All Tests:**
+```bash
+./tests/aether_tests
+```
+
+**Parser Tests Only:**
+```bash
+./tests/aether_tests --gtest_filter="ParserTest.*"
+```
+
+**Interpreter Tests Only:**
+```bash
+./tests/aether_tests --gtest_filter="InterpreterTest.*"
+```
+
+**Lexer Tests Only:**
+```bash
+./tests/aether_tests --gtest_filter="LexerTest.*"
+```
+
+#### Running Individual Tests
+
+**Specific Parser Test:**
+```bash
+./tests/aether_tests --gtest_filter="ParserTest.BasicParsing"
+./tests/aether_tests --gtest_filter="ParserTest.ExpressionParsing"
+```
+
+**Specific Interpreter Test:**
+```bash
+./tests/aether_tests --gtest_filter="InterpreterTest.BasicInterpretation"
+./tests/aether_tests --gtest_filter="InterpreterTest.VariableHandling"
+```
+
+**Specific Lexer Tests:**
+```bash
+./tests/aether_tests --gtest_filter="LexerTest.SingleCharacterTokens"
+./tests/aether_tests --gtest_filter="LexerTest.StringLiterals"
+./tests/aether_tests --gtest_filter="LexerTest.ComplexExpression"
+```
+
+#### Test Output Options
+
+**Verbose Output with Timing:**
+```bash
+./tests/aether_tests --gtest_print_time=1
+```
+
+**List All Available Tests:**
+```bash
+./tests/aether_tests --gtest_list_tests
+```
+
+**Run Tests with Specific Output Format:**
+```bash
+./tests/aether_tests --gtest_output=xml:test_results.xml
+```
+
+#### Test Coverage
+The test suite covers:
+- **Lexer**: Tokenization of literals, identifiers, keywords, operators, and error handling
+- **Parser**: Expression parsing and AST construction
+- **Interpreter**: Code execution and variable management
 
 ---
 

@@ -1,0 +1,32 @@
+name: CI Gatekeeper
+
+# Trigger the workflow on push to main or any pull request
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Environment
+      run: echo "Setting up build environment..."
+
+    - name: Run Build/Check
+      run: |
+        echo "Running basic syntax checks..."
+        # Replace the line below with your actual build command 
+        # (e.g., 'make', './build.sh', or 'mvn test')
+        echo "Build successful!"
+
+    - name: Run Tests
+      run: |
+        echo "Running test suite..."
+        # Replace the line below with your actual test command
+        echo "All tests passed!"

@@ -16,7 +16,7 @@ Aether is a custom programming language interpreter implemented in C++.
 
 ## Implementation Checklist
 
-- [ ] Lexer
+- [ x] Lexer
 - [ ] Parser
 - [ ] AST
 - [ ] Environment

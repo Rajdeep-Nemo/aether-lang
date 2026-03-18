@@ -23,6 +23,10 @@ Aether is a custom programming language interpreter implemented in C++.
 
 ### Building the Project
 1. Clone or navigate to the project directory.
+   ```bash
+   git clone https://github.com/Rajdeep-Nemo/aether-lang.git
+   cd aether-lang
+   ```
 2. Create a build directory:
    ```bash
    mkdir build

@@ -98,7 +98,7 @@ Token create_token(const TokenType token_type)
 {
     Token token;
     token.type = token_type;
-    token.lexeme = std::string_view(scanner.start , scanner.current - scanner.start);
+    token.lexeme = std::string(scanner.start , scanner.current - scanner.start);
     token.line = scanner.line;
     return token;
 }
@@ -107,7 +107,7 @@ Token error_token(const char* message)
 {
     Token token;
     token.type = TokenType::ERROR_TOKEN;
-    token.lexeme = message;
+    token.lexeme = std::string(message);
     token.line = scanner.line;
     return token;
 }
@@ -220,9 +220,10 @@ static Token is_string_literal()
         if (peek() == '\n')
         {
             scanner.line++;
+            advance();
         }
         // To check escape sequence
-        if (peek() == '\\')
+        else if (peek() == '\\')
         {
             advance();
             if (is_at_end())

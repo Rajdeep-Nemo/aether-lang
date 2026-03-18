@@ -23,11 +23,11 @@ jobs:
 
     - name: Configure CMake
       # This creates a 'build' directory and prepares the project
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug
 
     - name: Build Lexer
       # This actually compiles your C++ code
-      run: cmake --build build --config Release
+      run: cmake --build build --config Debug
 
     - name: Lexer Smoke Test
       run: |

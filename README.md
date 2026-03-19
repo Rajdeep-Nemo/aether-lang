@@ -6,7 +6,7 @@ Aether is a custom programming language interpreter implemented in C++.
 
 ## 🛠 Architecture & Design
 
-**Aether** is implemented using a **procedural C++20** approach. The codebase intentionally avoids heavy Object-Oriented Programming (OOP) patterns in favor of a data-driven design:
+**Aether** is implemented using a **procedural C++20* approach. The codebase intentionally avoids heavy Object-Oriented Programming (OOP) patterns in favor of a data-driven design:
 
 * **POD (Plain Old Data) Structures:** Utilizing `structs` for AST nodes and tokens to ensure a predictable memory layout and cache-friendly data handling.
 * **Functional Decomposition:** Maintains a clear separation between raw data structures and the logic-heavy components (Lexer, Parser, and Interpreter).

@@ -19,16 +19,26 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake g++
+        sudo apt-get install -y build-essential cmake g++ ccache clang-format
 
     - name: Check Code Formatting
       run: |
-        # This finds all .cpp and .h files and checks if they match the style
-        find . -iname *.cpp -o -iname *.h | xargs clang-format --dry-run --Werror
+        # This finds all .cpp and .hpp files and checks if they match the style
+        find . -iname *.cpp -o -iname *.hpp | xargs clang-format --dry-run --Werror
+
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-ccache
+        variant: ccache
 
     - name: Configure CMake
       # This creates a 'build' directory and prepares the project
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug
+      run: | 
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
     - name: Build Lexer
       # This actually compiles your C++ code

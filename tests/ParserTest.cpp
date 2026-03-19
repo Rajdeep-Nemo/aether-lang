@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include <Parser/parser.hpp>
+#include <gtest/gtest.h>
 
 class ParserTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         // Setup code if needed
     }

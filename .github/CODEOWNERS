@@ -1,0 +1,10 @@
+# This is a comment.
+# The '*' means "Every file in the repository."
+# Only you can approve these changes by default.
+* @Rajdeep-Nemo
+
+# If you want your friend to be the "Expert" for documentation:
+/docs/  @EL-STRIX
+
+# If you both should be notified for the Lexer:
+/src/lexer/ @Rajdeep-Nemo

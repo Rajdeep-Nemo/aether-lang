@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include <Interpreter/interpreter.hpp>
+#include <gtest/gtest.h>
 
 class InterpreterTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         // Setup code if needed
     }

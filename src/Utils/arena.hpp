@@ -8,7 +8,7 @@ struct Arena {
     size_t arena_offset;
 };
 // Initialize the arena
-void arena_init(Arena *arena);
+void arena_init(Arena *arena, size_t capacity);
 // Allocate memory for the arena
 void *arena_alloc(Arena *arena, size_t size);
 // Free the memory

@@ -4,12 +4,16 @@
 #include <cstdint>
 #include <token.hpp>
 
+struct ASTNode;
+
+// The "tag" that identifies the specific type of this AST node (e.g., Number, Binary Expr)
+// so the interpreter/compiler knows which payload to safely read from the union.
 enum class NodeType {
     NUM_LITERAL,
     BINARY_EXPR
 };
 
-struct ASTNode;
+
 
 struct NumberLiteralPayload {
     enum class NumberType {
@@ -39,6 +43,8 @@ struct BinaryExprPayload {
     TokenType operator_type;
 };
 
+// The master tagged union representing a single node in the syntax tree.
+// It guarantees every node uses the exact same amount of memory for lightning-fast Arena allocation.
 struct ASTNode {
     NodeType node_type;
     union {

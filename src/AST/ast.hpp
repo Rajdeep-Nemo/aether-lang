@@ -13,8 +13,6 @@ enum class NodeType {
     BINARY_EXPR
 };
 
-
-
 struct NumberLiteralPayload {
     enum class NumberType {
         TYPE_I8,

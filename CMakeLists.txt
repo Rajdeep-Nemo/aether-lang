@@ -11,11 +11,11 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add library source files (excluding main.cpp)
+# Library source files
 set(AETHER_LIB_SOURCES
     src/AST/ast.cpp
     src/Builtins/builtin.cpp
-        src/Evaluator/evaluator.cpp
+    src/Evaluator/evaluator.cpp
     src/Lexer/lexer.cpp
     src/Parser/parser.cpp
     src/Runtime/environment.cpp
@@ -24,17 +24,17 @@ set(AETHER_LIB_SOURCES
     src/Util/error.cpp
 )
 
-# Add main executable source
+# Main executable source
 set(AETHER_MAIN_SOURCES
     src/main.cpp
 )
 
-# Add header include directories
+# Header include directories
 set(AETHER_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Builtins
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Evaluator
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Evaluator
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Runtime
@@ -50,10 +50,10 @@ add_executable(aether ${AETHER_MAIN_SOURCES})
 # Link executable to library
 target_link_libraries(aether PRIVATE aether_lib)
 
-# Add include directories for library
+# Include directories for library
 target_include_directories(aether_lib PUBLIC ${AETHER_INCLUDE_DIRS})
 
-# Add include directories for executable
+# Include directories for executable
 target_include_directories(aether PRIVATE ${AETHER_INCLUDE_DIRS})
 
 # Set compiler flags for better error reporting

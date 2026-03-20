@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(AETHER_LIB_SOURCES
     src/AST/ast.cpp
     src/Builtins/builtin.cpp
-    src/Interpreter/interpreter.cpp
+        src/Evaluator/evaluator.cpp
     src/Lexer/lexer.cpp
     src/Parser/parser.cpp
     src/Runtime/environment.cpp
@@ -34,7 +34,7 @@ set(AETHER_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Builtins
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Interpreter
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Evaluator
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Runtime

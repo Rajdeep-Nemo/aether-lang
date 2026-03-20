@@ -1,4 +1,4 @@
-#include <Interpreter/interpreter.hpp>
+#include <Evaluator/evaluator.hpp>
 #include <gtest/gtest.h>
 
 class InterpreterTest : public ::testing::Test {

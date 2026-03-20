@@ -142,8 +142,8 @@ aether-lang/
 │   │   ├── builtin.cpp     # Implementation of built-in functions and operations
 │   │   └── builtin.hpp     # Header for built-in function declarations
 │   ├── Interpreter/
-│   │   ├── interpreter.cpp # Core interpreter logic for executing Aether code
-│   │   └── interpreter.hpp # Header for interpreter functions and execution context
+│   │   ├── evaluator.cpp # Core interpreter logic for executing Aether code
+│   │   └── evaluator.hpp # Header for interpreter functions and execution context
 │   ├── Lexer/
 │   │   ├── lexer.cpp       # Implementation of lexical analysis (tokenization)
 │   │   ├── lexer.hpp       # Header for lexer functions and token scanning

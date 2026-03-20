@@ -1,9 +1,16 @@
 #ifndef ARENA_HPP
 #define ARENA_HPP
+
 #include <cstddef>
+// Struct to hold each chunk
+struct ArenaChunk {
+    std::byte *arena_buffer;
+    ArenaChunk *next;
+};
 // Struct to hold the arena
 struct Arena {
-    std::byte *arena_buffer;
+    ArenaChunk *head;
+    ArenaChunk *current;
     size_t arena_capacity;
     size_t arena_offset;
 };

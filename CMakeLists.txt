@@ -21,7 +21,8 @@ set(AETHER_LIB_SOURCES
     src/Runtime/environment.cpp
     src/Runtime/object.cpp
     src/Runtime/value.cpp
-    src/Util/error.cpp
+    src/Utils/error.cpp
+    src/Utils/arena.cpp
 )
 
 # Main executable source
@@ -38,7 +39,7 @@ set(AETHER_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Runtime
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Util
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils
 )
 
 # Create static library

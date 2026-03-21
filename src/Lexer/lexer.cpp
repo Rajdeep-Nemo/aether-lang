@@ -1,21 +1,10 @@
 #include "lexer.hpp"
 #include "token.hpp"
 #include <cassert>
-#include <cstdlib>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <memory>
-static constexpr char empty[] = "";
-// struct to iterate through the source code
-struct Scanner {
-    std::string source;
-    const char *start = empty;
-    const char *current = empty;
-    std::size_t line{};
-};
-// Instance created
-static Scanner scanner;
 // Function to initialize our scanner
 void init_scanner(std::string src) {
     scanner.source = std::move(src);
@@ -24,25 +13,25 @@ void init_scanner(std::string src) {
     scanner.line = 1;
 }
 // Function that checks if we read the complete file or not
-bool is_at_end() {
+static bool is_at_end() {
     if (*scanner.current == '\0') {
         return true;
     }
     return false;
 }
 // Function that moves the pointer 'current' forward
-char advance() {
+static char advance() {
     if (is_at_end()) {
         return '\0';
     }
     return *scanner.current++;
 }
 // Function to check the next character
-char peek() {
+static char peek() {
     return *scanner.current;
 }
 // Function to check the second next character
-char peek_next() {
+static char peek_next() {
     if (*scanner.current == '\0') {
         return '\0';
     }
@@ -525,20 +514,6 @@ Token scan_token() {
             return is_identifier();
         return error_token("Unexpected character.");
     }
-}
-// Checks the next token without consuming the current one
-Token peek_token() {
-    const char *saved_start = scanner.start;
-    const char *saved_current = scanner.current;
-    const std::size_t saved_line = scanner.line;
-
-    Token t = scan_token();
-
-    scanner.start = saved_start;
-    scanner.current = saved_current;
-    scanner.line = saved_line;
-
-    return t;
 }
 // Function to manage the process
 bool run_file(const char *path) {

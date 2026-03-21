@@ -3,16 +3,18 @@
 
 #include "token.hpp"
 
+static constexpr char empty[] = "";
+// struct to iterate through the source code
+struct Scanner {
+    std::string source;
+    const char *start = empty;
+    const char *current = empty;
+    std::size_t line{};
+};
+// Instance created
+static Scanner scanner;
 // Function to initialize our scanner
 void init_scanner(std::string src);
-// Function that checks if we read the complete file or not
-bool is_at_end();
-// Function that moves the pointer 'current' forward
-char advance();
-// Function to check the next character
-char peek();
-// Function to check the second next character
-char peek_next();
 // Function to skip whitespace characters
 void skip_whitespace();
 // Function to create a token
@@ -33,7 +35,6 @@ TokenType check_keyword(int start, int length, const char *rest, TokenType type)
 Token scan_token();
 // Function to manage the process
 bool run_file(const char *path);
-// Checks the next token without consuming the current one
-Token peek_token();
+
 
 #endif

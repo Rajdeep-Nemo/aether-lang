@@ -1,31 +1,80 @@
 #include "evaluator.hpp"
 #include "ast.hpp"
-double evaluate(const ASTNode *node) {
+RuntimeValue evaluate(const ASTNode *node) {
     if (node == nullptr) {
-        return 0.0;
+        return RuntimeValue{ValueType::VAL_NIL};
     }
     if (node->node_type == NodeType::NUM_LITERAL) {
         if (node->number_literal.number_type == NumberLiteralPayload::NumberType::TYPE_I64) {
-            return static_cast<double>(node->number_literal.i);
+            const RuntimeValue runtime_int{ValueType::VAL_INT, node->number_literal.i};
+            return runtime_int;
         }
         if (node->number_literal.number_type == NumberLiteralPayload::NumberType::TYPE_U64) {
-            return static_cast<double>(node->number_literal.u);
+            RuntimeValue runtime_uint{};
+            runtime_uint.type = ValueType::VAL_UINT;
+            runtime_uint.u = node->number_literal.u;
+            return runtime_uint;
         }
         if (node->number_literal.number_type == NumberLiteralPayload::NumberType::TYPE_F64) {
-            return node->number_literal.f;
+            RuntimeValue runtime_float{};
+            runtime_float.type = ValueType::VAL_FLOAT;
+            runtime_float.f = node->number_literal.f;
+            return runtime_float;
         }
     }
     if (node->node_type == NodeType::BINARY_EXPR) {
-        const double left_val = evaluate(node->binary_expr.left_node);
-        const double right_val = evaluate(node->binary_expr.right_node);
+        const RuntimeValue left_val = evaluate(node->binary_expr.left_node);
+        const RuntimeValue right_val = evaluate(node->binary_expr.right_node);
 
-        switch (node->binary_expr.operator_type) {
-        case TokenType::PLUS: return left_val + right_val;
-        case TokenType::MINUS: return left_val - right_val;
-        case TokenType::STAR: return left_val * right_val;
-        case TokenType::SLASH: return left_val / right_val;
-        default: return 0.0;
+        if (left_val.type == ValueType::VAL_FLOAT || right_val.type == ValueType::VAL_FLOAT) {
+            double l_val = 0.0;
+            if (left_val.type == ValueType::VAL_FLOAT) {
+                l_val = left_val.f;
+            } else if (left_val.type == ValueType::VAL_INT) {
+                l_val = static_cast<double>(left_val.i);
+            } else if (left_val.type == ValueType::VAL_UINT) {
+                l_val = static_cast<double>(left_val.u);
+            }
+            double r_val = 0.0;
+            if (right_val.type == ValueType::VAL_FLOAT) {
+                r_val = right_val.f;
+            } else if (right_val.type == ValueType::VAL_INT) {
+                r_val = static_cast<double>(right_val.i);
+            } else if (right_val.type == ValueType::VAL_UINT) {
+                r_val = static_cast<double>(right_val.u);
+            }
+            switch (node->binary_expr.operator_type) {
+                case TokenType::PLUS: {
+                    RuntimeValue add{};
+                    add.type = ValueType::VAL_FLOAT;
+                    add.f = l_val + r_val;
+                    return add;
+                }
+                case TokenType::MINUS: {
+                    RuntimeValue sub{};
+                    sub.type = ValueType::VAL_FLOAT;
+                    sub.f = l_val - r_val;
+                    return sub;
+                }
+                case TokenType::STAR: {
+                    RuntimeValue mul{};
+                    mul.type = ValueType::VAL_FLOAT;
+                    mul.f = l_val * r_val;
+                    return mul;
+                }
+                case TokenType::SLASH: {
+                    RuntimeValue div{};
+                    div.type = ValueType::VAL_FLOAT;
+                    div.f = l_val / r_val;
+                    return div;
+                }
+                default: {
+                    RuntimeValue nil{};
+                    nil.type = ValueType::VAL_NIL;
+                    return nil;
+                }
+            }
         }
     }
-    return 0.0;
+    return RuntimeValue{ValueType::VAL_NIL};
 }

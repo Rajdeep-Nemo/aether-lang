@@ -530,7 +530,7 @@ Token scan_token() {
 Token peek_token() {
     const char *saved_start = scanner.start;
     const char *saved_current = scanner.current;
-    std::size_t saved_line = scanner.line;
+    const std::size_t saved_line = scanner.line;
 
     Token t = scan_token();
 

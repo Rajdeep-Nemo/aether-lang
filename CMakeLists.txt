@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 4.3)
 project(aether-lang)
 
 # Enable AddressSanitizer for Debug builds

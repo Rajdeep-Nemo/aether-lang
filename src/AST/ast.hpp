@@ -50,5 +50,15 @@ struct ASTNode {
         BinaryExprPayload binary_expr;
     };
 };
+// Forward declaration so the AST knows the Arena exists
+struct Arena;
+// Factory for signed integer
+ASTNode *create_int_node(Arena *arena, int64_t value);
+// Factory for unsigned integer
+ASTNode *create_uint_node(Arena *arena, uint64_t value);
+// Factory for floating points
+ASTNode *create_double_node(Arena *arena, double value);
+// Factory for binary expressions
+ASTNode *create_binary_expr_node(Arena *arena, ASTNode *left, ASTNode *right, TokenType operator_type);
 
 #endif

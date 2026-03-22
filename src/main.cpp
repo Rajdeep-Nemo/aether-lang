@@ -1,7 +1,7 @@
+#include "AST/ast.hpp"
+#include "Evaluator/evaluator.hpp"
 #include "Lexer/lexer.hpp"
 #include "Parser/parser.hpp"
-#include "Evaluator/evaluator.hpp"
-#include "AST/ast.hpp"
 #include "Utils/arena.hpp"
 #include <format>
 #include <iostream>
@@ -27,7 +27,7 @@ int main(const int argc, char *argv[]) {
             tokens.push_back(t);
         } while (t.type != TokenType::END_OF_FILE);
         // Arena allocation
-        Arena start_arena;
+        Arena start_arena{};
         init_arena(&start_arena, 1024 * 1024);
         // Parser initialization
         Parser parser;
@@ -36,8 +36,24 @@ int main(const int argc, char *argv[]) {
         parser.arena = &start_arena;
         // Execution
         const ASTNode *root = parse(&parser);
-        const double result = evaluate(root);
-        std::cout << result << "\n";
+        const RuntimeValue result = evaluate(root);
+        switch (result.type) {
+        case ValueType::VAL_INT:
+            std::cout << result.i << '\n';
+            break;
+        case ValueType::VAL_UINT:
+            std::cout << result.u << '\n';
+            break;
+        case ValueType::VAL_FLOAT:
+            std::cout << result.f << '\n';
+            break;
+        case ValueType::VAL_NIL:
+            std::cout << "NIL\n";
+            break;
+        default:
+            std::cout << "Unknown Type\n";
+            break;
+        }
         // Arena deallocation
         free_arena(&start_arena);
         return 0;

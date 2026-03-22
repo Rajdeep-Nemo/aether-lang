@@ -1,8 +1,9 @@
 #include "evaluator.hpp"
+#include "environment.hpp"
 #include "ast.hpp"
+#include "error.hpp"
 
-#include <iostream>
-RuntimeValue evaluate(const ASTNode *node) {
+RuntimeValue evaluate(const ASTNode *node, Environment *env) {
     if (node == nullptr) {
         return RuntimeValue{ValueType::VAL_NIL};
     }
@@ -24,9 +25,15 @@ RuntimeValue evaluate(const ASTNode *node) {
             return runtime_float;
         }
     }
+    if (node->node_type == NodeType::BOOLEAN_LITERAL) {
+        RuntimeValue runtime_boolean{};
+        runtime_boolean.type = ValueType::VAL_BOOLEAN;
+        runtime_boolean.b = node->boolean_literal.value;
+        return runtime_boolean;
+    }
     if (node->node_type == NodeType::BINARY_EXPR) {
-        const RuntimeValue left_val = evaluate(node->binary_expr.left_node);
-        const RuntimeValue right_val = evaluate(node->binary_expr.right_node);
+        const RuntimeValue left_val = evaluate(node->binary_expr.left_node, env);
+        const RuntimeValue right_val = evaluate(node->binary_expr.right_node, env);
 
         if (left_val.type == ValueType::VAL_FLOAT || right_val.type == ValueType::VAL_FLOAT) {
             double l_val = 0.0;
@@ -66,13 +73,49 @@ RuntimeValue evaluate(const ASTNode *node) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0.0) {
-                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    report_runtime_error("Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_FLOAT;
                 div.f = l_val / r_val;
                 return div;
+            }
+            case TokenType::EQUAL_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val == r_val;
+                return res;
+            }
+            case TokenType::BANG_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val != r_val;
+                return res;
+            }
+            case TokenType::LESS: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val < r_val;
+                return res;
+            }
+            case TokenType::LESS_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val <= r_val;
+                return res;
+            }
+            case TokenType::GREATER: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val > r_val;
+                return res;
+            }
+            case TokenType::GREATER_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val >= r_val;
+                return res;
             }
             default: {
                 RuntimeValue nil{};
@@ -105,13 +148,49 @@ RuntimeValue evaluate(const ASTNode *node) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0) {
-                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    report_runtime_error("Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_UINT;
                 div.u = l_val / r_val;
                 return div;
+            }
+            case TokenType::EQUAL_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val == r_val;
+                return res;
+            }
+            case TokenType::BANG_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val != r_val;
+                return res;
+            }
+            case TokenType::LESS: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val < r_val;
+                return res;
+            }
+            case TokenType::LESS_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val <= r_val;
+                return res;
+            }
+            case TokenType::GREATER: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val > r_val;
+                return res;
+            }
+            case TokenType::GREATER_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val >= r_val;
+                return res;
             }
             default: {
                 RuntimeValue nil{};
@@ -144,13 +223,49 @@ RuntimeValue evaluate(const ASTNode *node) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0) {
-                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    report_runtime_error("Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_INT;
                 div.i = l_val / r_val;
                 return div;
+            }
+            case TokenType::EQUAL_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val == r_val;
+                return res;
+            }
+            case TokenType::BANG_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val != r_val;
+                return res;
+            }
+            case TokenType::LESS: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val < r_val;
+                return res;
+            }
+            case TokenType::LESS_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val <= r_val;
+                return res;
+            }
+            case TokenType::GREATER: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val > r_val;
+                return res;
+            }
+            case TokenType::GREATER_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val >= r_val;
+                return res;
             }
             default: {
                 RuntimeValue nil{};
@@ -159,13 +274,37 @@ RuntimeValue evaluate(const ASTNode *node) {
             }
             }
         }
-        std::cerr << "Runtime Error: Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.\n" << std::endl;
+        if (left_val.type == ValueType::VAL_BOOLEAN && right_val.type == ValueType::VAL_BOOLEAN) {
+            bool l_val = left_val.b;
+            bool r_val = right_val.b;
+            switch (node->binary_expr.operator_type) {
+            case TokenType::EQUAL_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val == r_val;
+                return res;
+            }
+            case TokenType::BANG_EQUAL: {
+                RuntimeValue res{};
+                res.type = ValueType::VAL_BOOLEAN;
+                res.b = l_val != r_val;
+                return res;
+            }
+            default: {
+                report_runtime_error("Invalid operator for booleans.");
+                RuntimeValue nil{};
+                nil.type = ValueType::VAL_NIL;
+                return nil;
+            }
+            }
+        }
+        report_runtime_error("Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
         RuntimeValue nil{};
         nil.type = ValueType::VAL_NIL;
         return nil;
     }
     if (node->node_type == NodeType::UNARY_EXPR) {
-        RuntimeValue right = evaluate(node->unary_expr.right);
+        RuntimeValue right = evaluate(node->unary_expr.right, env);
         if (right.type == ValueType::VAL_INT) {
             RuntimeValue neg{};
             neg.type = ValueType::VAL_INT;
@@ -179,10 +318,35 @@ RuntimeValue evaluate(const ASTNode *node) {
             return neg;
         }
         if (right.type == ValueType::VAL_UINT) {
-            std::cerr << "Runtime Error: Cannot apply unary minus to an unsigned integer.\n" << std::endl;
+            report_runtime_error("Cannot apply unary minus to an unsigned integer.");
             return RuntimeValue{ValueType::VAL_NIL};
         }
     }
+    if (node->node_type == NodeType::VAR_DECLARATION) {
+        RuntimeValue val{};
+
+        // If initialized (e.g., let x: i32 = 5;)
+        if (node->var_declaration.value != nullptr) {
+            val = evaluate(node->var_declaration.value, env);
+        }
+        // If not (e.g., let x: i32;) assign NIL
+        else {
+            val.type = ValueType::VAL_NIL;
+        }
+
+        // Saves it to memory! (Convert string_view to string for the unordered_map key)
+        env->define(std::string(node->var_declaration.var_name), val);
+
+        // Statements don't evaluate to a mathematical number, so returns NIL
+        return RuntimeValue{ValueType::VAL_NIL};
+    }
+    if (node->node_type == NodeType::VAR_ACCESS) {
+        return env->get(std::string(node->var_access.var_name));
+    }
+    if (node->node_type == NodeType::ASSIGNMENT_EXPR) {
+        RuntimeValue val = evaluate(node->var_assignment.value, env);
+        env->assign(std::string(node->var_assignment.var_name), val);
+        return RuntimeValue{ValueType::VAL_NIL};
+    }
     return RuntimeValue{ValueType::VAL_NIL};
 }
-

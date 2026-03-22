@@ -345,9 +345,16 @@ static TokenType identifier_type() {
             }
         }
         break;
-        // Check loop
+        // Check loop and let
     case 'l':
-        return check_keyword(1, 3, "oop", TokenType::LOOP);
+        if (scanner.current - scanner.start > 1) {
+            switch (scanner.start[1]) {
+            case 'o': return check_keyword(2, 2, "op", TokenType::LOOP);
+            case 'e': return check_keyword(2, 1, "t", TokenType::LET);
+            default:;
+            }
+        }
+        break;
         // Check match
     case 'm':
         return check_keyword(1, 4, "atch", TokenType::MATCH);

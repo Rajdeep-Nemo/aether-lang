@@ -1,5 +1,7 @@
 #include "AST/ast.hpp"
 #include "Evaluator/evaluator.hpp"
+#include "Runtime/environment.hpp"
+#include "Runtime/value.hpp"
 #include "Lexer/lexer.hpp"
 #include "Parser/parser.hpp"
 #include "Utils/arena.hpp"
@@ -34,25 +36,39 @@ int main(const int argc, char *argv[]) {
         parser.tokens = tokens;
         parser.current_position = 0;
         parser.arena = &start_arena;
+        // Environment initialization
+        Environment global_env;
         // Execution
-        const ASTNode *root = parse(&parser);
-        const RuntimeValue result = evaluate(root);
-        switch (result.type) {
-        case ValueType::VAL_INT:
-            std::cout << result.i << '\n';
-            break;
-        case ValueType::VAL_UINT:
-            std::cout << result.u << '\n';
-            break;
-        case ValueType::VAL_FLOAT:
-            std::cout << result.f << '\n';
-            break;
-        case ValueType::VAL_NIL:
-            std::cout << "NIL\n";
-            break;
-        default:
-            std::cout << "Unknown Type\n";
-            break;
+        while (!is_at_end(&parser)) {
+            const ASTNode *root = parse(&parser);
+            // If parsing fails, enter panic mode
+            if (root == nullptr) {
+                // Panic Mode: Fast-forward to the next safe statement
+                synchronize(&parser);
+                // Skip the evaluator and try to parse the next line
+                continue;
+            }
+            const RuntimeValue result = evaluate(root, &global_env);
+            switch (result.type) {
+            case ValueType::VAL_INT:
+                std::cout << result.i << '\n';
+                break;
+            case ValueType::VAL_UINT:
+                std::cout << result.u << '\n';
+                break;
+            case ValueType::VAL_FLOAT:
+                std::cout << result.f << '\n';
+                break;
+            case ValueType::VAL_BOOLEAN:
+                std::cout << (result.b ? "true" : "false") << '\n';
+                break;
+            case ValueType::VAL_NIL:
+                std::cout << "NIL\n";
+                break;
+            default:
+                std::cout << "Unknown Type\n";
+                break;
+            }
         }
         // Arena deallocation
         free_arena(&start_arena);

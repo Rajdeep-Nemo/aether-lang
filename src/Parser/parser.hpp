@@ -16,15 +16,25 @@ Token peek(Parser *parser);
 Token advance(Parser *parser);
 // Function to check if we have reached the end of the file
 bool is_at_end(const Parser *parser);
+// Returns the DataType corresponding to the TokenType
+DataType get_data_type (TokenType type);
 // Function to parse the tokens into AST
 ASTNode *parse(Parser *parser);
 // Parses unary
 ASTNode *parse_unary(Parser *parser);
+// Parses comparison
+ASTNode *parse_comparison(Parser *parser);
 // Parses a number literal (integers/floating points)
 ASTNode *parse_primary(Parser *parser);
 // Parses * and /
 ASTNode *parse_multiplication_and_division(Parser *parser);
 // Parses + and -
 ASTNode *parse_addition_and_subtraction(Parser *parser);
+// Parses a statement
+ASTNode *parse_statement(Parser *parser);
+// Parses an assignment
+ASTNode *parse_assignment(Parser *parser);
+// Synchronize the parser after a syntax error (Heart attack stopper)
+void synchronize(Parser *parser);
 
 #endif //PARSER_HPP

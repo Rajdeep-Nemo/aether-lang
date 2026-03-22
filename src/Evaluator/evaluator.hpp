@@ -2,9 +2,11 @@
 #define EVALUATOR_HPP
 #include "ast.hpp"
 #include "value.hpp"
+#include "environment.hpp"
+
 // Forward declare ASTNode
 struct ASTNode;
 // Evaluates an AST and returns the mathematical result
-RuntimeValue evaluate(const ASTNode *node);
+RuntimeValue evaluate(const ASTNode *node, Environment *env);
 
 #endif //EVALUATOR_HPP

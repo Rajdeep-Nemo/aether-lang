@@ -15,8 +15,15 @@ Before contributing, ensure you have the following installed to match our enviro
 ## 🧹 How to Contribute
 1. **Branch:** Create your branch from `main`. Use a descriptive name (e.g., `git checkout -b feature/new-token-type` or `git checkout -b fix/lexer-crash`).
 2. **Format Your Code:** Before committing, you **must** run the following command to ensure your code matches the project style. If you don't, the CI will automatically fail your Pull Request.
-   ```bash
-   find . -iname *.cpp -o -iname *.hpp | xargs clang-format -i
+    ### From build folder:
+    ```bash
+   make format
+    ```  
+    ### From the project root (Universal command):
+    ```bash
+    cmake --build build --target format
+    ```
+   
 3. **Include Tests:** If you are adding a feature or fixing a bug, please include a sample .at file or update the test suite to verify your changes.
 4. **Document Changes:** Update the README or inline comments if your change introduces new functionality or changes existing behavior.
 

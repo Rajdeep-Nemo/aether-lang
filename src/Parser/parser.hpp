@@ -18,10 +18,13 @@ Token advance(Parser *parser);
 bool is_at_end(const Parser *parser);
 // Function to parse the tokens into AST
 ASTNode *parse(Parser *parser);
+// Parses unary
+ASTNode *parse_unary(Parser *parser);
 // Parses a number literal (integers/floating points)
-ASTNode *parse_number(Parser *parser);
+ASTNode *parse_primary(Parser *parser);
 // Parses * and /
 ASTNode *parse_multiplication_and_division(Parser *parser);
 // Parses + and -
 ASTNode *parse_addition_and_subtraction(Parser *parser);
+
 #endif //PARSER_HPP

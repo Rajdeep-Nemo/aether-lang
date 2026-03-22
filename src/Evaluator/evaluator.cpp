@@ -65,6 +65,10 @@ RuntimeValue evaluate(const ASTNode *node) {
                 return mul;
             }
             case TokenType::SLASH: {
+                if (r_val == 0.0) {
+                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    return RuntimeValue{ValueType::VAL_NIL};
+                }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_FLOAT;
                 div.f = l_val / r_val;
@@ -100,6 +104,10 @@ RuntimeValue evaluate(const ASTNode *node) {
                 return mul;
             }
             case TokenType::SLASH: {
+                if (r_val == 0) {
+                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    return RuntimeValue{ValueType::VAL_NIL};
+                }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_UINT;
                 div.u = l_val / r_val;
@@ -135,6 +143,10 @@ RuntimeValue evaluate(const ASTNode *node) {
                 return mul;
             }
             case TokenType::SLASH: {
+                if (r_val == 0) {
+                    std::cerr << "Runtime Error: Division by zero." << std::endl;
+                    return RuntimeValue{ValueType::VAL_NIL};
+                }
                 RuntimeValue div{};
                 div.type = ValueType::VAL_INT;
                 div.i = l_val / r_val;
@@ -151,6 +163,25 @@ RuntimeValue evaluate(const ASTNode *node) {
         RuntimeValue nil{};
         nil.type = ValueType::VAL_NIL;
         return nil;
+    }
+    if (node->node_type == NodeType::UNARY_EXPR) {
+        RuntimeValue right = evaluate(node->unary_expr.right);
+        if (right.type == ValueType::VAL_INT) {
+            RuntimeValue neg{};
+            neg.type = ValueType::VAL_INT;
+            neg.i = -right.i;
+            return neg;
+        }
+        if (right.type == ValueType::VAL_FLOAT) {
+            RuntimeValue neg{};
+            neg.type = ValueType::VAL_FLOAT;
+            neg.f = -right.f;
+            return neg;
+        }
+        if (right.type == ValueType::VAL_UINT) {
+            std::cerr << "Runtime Error: Cannot apply unary minus to an unsigned integer.\n" << std::endl;
+            return RuntimeValue{ValueType::VAL_NIL};
+        }
     }
     return RuntimeValue{ValueType::VAL_NIL};
 }

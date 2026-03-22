@@ -27,8 +27,17 @@ bool is_at_end(const Parser *parser) {
 ASTNode *parse(Parser *parser) {
     return parse_addition_and_subtraction(parser);
 }
-// Parses a number literal (integers/floating points)
-ASTNode *parse_number(Parser *parser) {
+// Parses unary
+ASTNode *parse_unary(Parser *parser) {
+    if (peek(parser).type == TokenType::MINUS) {
+        const Token op = advance(parser);
+        ASTNode *right = parse_unary(parser);
+        return create_unary_expr_node(parser->arena, right, op.type);
+    }
+    return parse_primary(parser);
+}
+// Parses a number literal and parentheses - '(' and ')'
+ASTNode *parse_primary(Parser *parser) {
     const Token current = peek(parser);
     if (current.type == TokenType::INT_LITERAL) {
         advance(parser);
@@ -38,15 +47,24 @@ ASTNode *parse_number(Parser *parser) {
         advance(parser);
         return create_double_node(parser->arena, std::stod(current.lexeme));
     }
+    if (current.type == TokenType::LEFT_PAREN) {
+        advance(parser);
+        ASTNode *inner_expr = parse_addition_and_subtraction(parser);
+        if (peek(parser).type != TokenType::RIGHT_PAREN) {
+            return nullptr;
+        }
+        advance(parser);
+        return inner_expr;
+    }
     return nullptr;
 }
 // Parses * and /
 ASTNode *parse_multiplication_and_division(Parser *parser) {
-    ASTNode *left = parse_number(parser);
+    ASTNode *left = parse_unary(parser);
     while (peek(parser).type == TokenType::STAR || peek(parser).type == TokenType::SLASH) {
         // "op" is the operator
         const Token op = advance(parser);
-        ASTNode *right = parse_number(parser);
+        ASTNode *right = parse_unary(parser);
         left = create_binary_expr_node(parser->arena, left, right, op.type);
     }
     return left;

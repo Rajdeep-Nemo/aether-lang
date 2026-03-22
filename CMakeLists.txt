@@ -70,6 +70,7 @@ add_subdirectory(tests)
 file(GLOB_RECURSE ALL_SOURCE_FILES
      src/*.cpp src/*.hpp src/*.h
      include/*.hpp include/*.h
+     tests/*.cpp tests/*.hpp tests/*.h
 )
 
 # Add a 'format' target

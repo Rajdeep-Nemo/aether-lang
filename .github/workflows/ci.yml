@@ -22,9 +22,7 @@ jobs:
         sudo apt-get install -y build-essential cmake g++ ccache clang-format
 
     - name: Check Code Formatting
-      run: |
-        # This finds all .cpp and .hpp files and checks if they match the style
-        find . -iname *.cpp -o -iname *.hpp | xargs clang-format --dry-run --Werror
+      run: find . -iname "*.cpp" -o -iname "*.hpp" -o -iname "*.h" | xargs clang-format --dry-run --Werror
 
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1.2

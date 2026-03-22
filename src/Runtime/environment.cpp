@@ -1,11 +1,11 @@
 #include "environment.hpp"
 #include "error.hpp"
 
-void Environment::define(const std::string &name, const RuntimeValue value) {
+void Environment::define(const std::string& name, const RuntimeValue value) {
     values[name] = value;
 }
 
-RuntimeValue Environment::get(const std::string &name, const size_t line) {
+RuntimeValue Environment::get(const std::string& name, const size_t line) {
     if (values.contains(name)) {
         return values[name];
     }
@@ -16,7 +16,7 @@ RuntimeValue Environment::get(const std::string &name, const size_t line) {
     return RuntimeValue{ValueType::VAL_NIL};
 }
 
-void Environment::assign(const std::string &name, const RuntimeValue value, const size_t line) {
+void Environment::assign(const std::string& name, const RuntimeValue value, const size_t line) {
     if (values.contains(name)) {
         values[name] = value;
         return;

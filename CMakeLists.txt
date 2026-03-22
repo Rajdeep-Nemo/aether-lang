@@ -67,3 +67,13 @@ endif()
 # Add tests subdirectory
 add_subdirectory(tests)
 
+file(GLOB_RECURSE ALL_SOURCE_FILES
+     src/*.cpp src/*.hpp src/*.h
+     include/*.hpp include/*.h
+)
+
+# Add a 'format' target
+add_custom_target(format
+    COMMAND clang-format -i ${ALL_SOURCE_FILES}
+    COMMENT "Formatting Aether source files with clang-format..."
+)

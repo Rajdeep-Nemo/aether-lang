@@ -2,14 +2,14 @@
 #include "error.hpp"
 #include "token.hpp"
 // Checks the next token without consuming the current one
-Token peek(Parser *parser) {
+Token peek(Parser* parser) {
     if (is_at_end(parser)) {
         return parser->tokens[parser->current_position];
     }
     return parser->tokens[parser->current_position];
 }
 // Consumes and returns the token
-Token advance(Parser *parser) {
+Token advance(Parser* parser) {
     Token t = peek(parser);
     if (!is_at_end(parser)) {
         parser->current_position++;
@@ -17,7 +17,7 @@ Token advance(Parser *parser) {
     return t;
 }
 // Function to check if the current token matches the expected token type
-bool is_at_end(const Parser *parser) {
+bool is_at_end(const Parser* parser) {
     if (parser->current_position >= parser->tokens.size() ||
         parser->tokens[parser->current_position].type == TokenType::END_OF_FILE) {
         return true;
@@ -58,36 +58,36 @@ DataType get_data_type(const TokenType type) {
     }
 }
 // Parse the tokens into AST
-ASTNode *parse(Parser *parser) {
+ASTNode* parse(Parser* parser) {
     return parse_statement(parser);
 }
 // Parses unary
-ASTNode *parse_unary(Parser *parser) {
+ASTNode* parse_unary(Parser* parser) {
     if (peek(parser).type == TokenType::MINUS) {
         const Token op = advance(parser);
-        ASTNode *right = parse_unary(parser);
+        ASTNode* right = parse_unary(parser);
         const size_t line = parser->tokens[parser->current_position].line;
         return create_unary_expr_node(line, parser->arena, right, op.type);
     }
     return parse_primary(parser);
 }
 // Parses comparison
-ASTNode *parse_comparison(Parser *parser) {
-    ASTNode *left = parse_addition_and_subtraction(parser);
+ASTNode* parse_comparison(Parser* parser) {
+    ASTNode* left = parse_addition_and_subtraction(parser);
     while (peek(parser).type == TokenType::EQUAL_EQUAL ||
            peek(parser).type == TokenType::BANG_EQUAL || peek(parser).type == TokenType::LESS ||
            peek(parser).type == TokenType::LESS_EQUAL || peek(parser).type == TokenType::GREATER ||
            peek(parser).type == TokenType::GREATER_EQUAL) {
 
         const Token op = advance(parser);
-        ASTNode *right = parse_addition_and_subtraction(parser);
+        ASTNode* right = parse_addition_and_subtraction(parser);
         const size_t line = parser->tokens[parser->current_position].line;
         left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
 // Parses a number literal and parentheses - '(' and ')'
-ASTNode *parse_primary(Parser *parser) {
+ASTNode* parse_primary(Parser* parser) {
     const Token current = peek(parser);
     if (current.type == TokenType::INT_LITERAL) {
         advance(parser);
@@ -101,7 +101,7 @@ ASTNode *parse_primary(Parser *parser) {
     }
     if (current.type == TokenType::LEFT_PAREN) {
         advance(parser);
-        ASTNode *inner_expr = parse_addition_and_subtraction(parser);
+        ASTNode* inner_expr = parse_addition_and_subtraction(parser);
         if (peek(parser).type != TokenType::RIGHT_PAREN) {
             return nullptr;
         }
@@ -127,35 +127,35 @@ ASTNode *parse_primary(Parser *parser) {
     return nullptr;
 }
 // Parses * and /
-ASTNode *parse_multiplication_and_division(Parser *parser) {
-    ASTNode *left = parse_unary(parser);
+ASTNode* parse_multiplication_and_division(Parser* parser) {
+    ASTNode* left = parse_unary(parser);
     while (peek(parser).type == TokenType::STAR || peek(parser).type == TokenType::SLASH) {
         // "op" is the operator
         const Token op = advance(parser);
-        ASTNode *right = parse_unary(parser);
+        ASTNode* right = parse_unary(parser);
         const size_t line = parser->tokens[parser->current_position].line;
         left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
 // Parses + and -
-ASTNode *parse_addition_and_subtraction(Parser *parser) {
-    ASTNode *left = parse_multiplication_and_division(parser);
+ASTNode* parse_addition_and_subtraction(Parser* parser) {
+    ASTNode* left = parse_multiplication_and_division(parser);
     while (peek(parser).type == TokenType::PLUS || peek(parser).type == TokenType::MINUS) {
         // "op" is the operator
         const Token op = advance(parser);
-        ASTNode *right = parse_multiplication_and_division(parser);
+        ASTNode* right = parse_multiplication_and_division(parser);
         const size_t line = parser->tokens[parser->current_position].line;
         left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
 // Parses a statement
-ASTNode *parse_statement(Parser *parser) {
+ASTNode* parse_statement(Parser* parser) {
     if (peek(parser).type == TokenType::LET) {
         advance(parser);
 
-        const Token &name_token = parser->tokens[parser->current_position];
+        const Token& name_token = parser->tokens[parser->current_position];
         advance(parser);
 
         if (peek(parser).type == TokenType::COLON) {
@@ -173,7 +173,7 @@ ASTNode *parse_statement(Parser *parser) {
             return nullptr;
         }
 
-        ASTNode *expr = nullptr;
+        ASTNode* expr = nullptr;
         if (peek(parser).type == TokenType::EQUAL) {
             advance(parser);
             expr = parse_comparison(parser);
@@ -189,7 +189,7 @@ ASTNode *parse_statement(Parser *parser) {
         return create_var_declaration_node(line, parser->arena, name_token.lexeme, var_type, expr);
     }
 
-    ASTNode *expr = parse_assignment(parser);
+    ASTNode* expr = parse_assignment(parser);
     // Consumes the last semicolon, if absent throws error
     if (peek(parser).type == TokenType::SEMICOLON) {
         advance(parser);
@@ -200,14 +200,14 @@ ASTNode *parse_statement(Parser *parser) {
     return expr;
 }
 // Parses an assignment
-ASTNode *parse_assignment(Parser *parser) {
+ASTNode* parse_assignment(Parser* parser) {
 
-    ASTNode *expr = parse_comparison(parser);
+    ASTNode* expr = parse_comparison(parser);
 
     if (peek(parser).type == TokenType::EQUAL) {
         advance(parser);
 
-        ASTNode *value = parse_comparison(parser);
+        ASTNode* value = parse_comparison(parser);
 
         if (expr != nullptr && expr->node_type == NodeType::VAR_ACCESS) {
             std::string_view var_name = expr->var_access.var_name;
@@ -221,7 +221,7 @@ ASTNode *parse_assignment(Parser *parser) {
     return expr;
 }
 // Synchronize the parser after a syntax error (Heart attack stopper)
-void synchronize(Parser *parser) {
+void synchronize(Parser* parser) {
     // Consume the token that caused the error
     advance(parser);
     // Keep throwing away tokens until a safe boundary is found

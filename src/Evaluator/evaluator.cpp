@@ -3,7 +3,7 @@
 #include "environment.hpp"
 #include "error.hpp"
 
-RuntimeValue evaluate(const ASTNode *node, Environment *env) {
+RuntimeValue evaluate(const ASTNode* node, Environment* env) {
     if (node == nullptr) {
         return RuntimeValue{ValueType::VAL_NIL};
     }

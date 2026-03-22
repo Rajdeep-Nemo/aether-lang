@@ -76,7 +76,7 @@ Token create_token(const TokenType token_type) {
     return token;
 }
 // Function for error reporting
-Token error_token(const char *message) {
+Token error_token(const char* message) {
     Token token;
     token.type = TokenType::ERROR_TOKEN;
     token.lexeme = std::string(message);
@@ -84,7 +84,7 @@ Token error_token(const char *message) {
     return token;
 }
 // Function to read input file into a buffer
-std::string read_file(const char *path) {
+std::string read_file(const char* path) {
     // Opens the file
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     // Checks if the file exists
@@ -239,7 +239,7 @@ static Token is_number_literal() {
     return create_token(isFloat ? TokenType::FLOAT_LITERAL : TokenType::INT_LITERAL);
 }
 // Helper to check keyword
-TokenType check_keyword(const int start, const int length, const char *rest, const TokenType type) {
+TokenType check_keyword(const int start, const int length, const char* rest, const TokenType type) {
     if (scanner.current - scanner.start == start + length &&
         std::string_view(scanner.start + start, length) == rest) {
         return type;
@@ -525,7 +525,7 @@ Token scan_token() {
     }
 }
 // Function to manage the process
-bool run_file(const char *path) {
+bool run_file(const char* path) {
     std::ifstream test(path);
     if (!test) {
         std::cerr << "File not found: " << path << '\n';

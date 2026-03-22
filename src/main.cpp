@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-int main(const int argc, char *argv[]) {
+int main(const int argc, char* argv[]) {
     if (argc == 1) {
         std::cout << "No input file provided.\n";
         std::cout << std::format("Usage: {} <file.at>\n", argv[0]);
@@ -40,7 +40,7 @@ int main(const int argc, char *argv[]) {
         Environment global_env;
         // Execution
         while (!is_at_end(&parser)) {
-            const ASTNode *root = parse(&parser);
+            const ASTNode* root = parse(&parser);
             // If parsing fails, enter panic mode
             if (root == nullptr) {
                 // Panic Mode: Fast-forward to the next safe statement

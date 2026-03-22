@@ -1,8 +1,8 @@
 #ifndef AST_HPP
 #define AST_HPP
 
-#include <string_view>
 #include <cstdint>
+#include <string_view>
 #include <token.hpp>
 
 // Forward declaration of the ASTNode struct
@@ -65,20 +65,20 @@ struct BooleanLiteralPayload {
 };
 // Payload for a binary expression node
 struct BinaryExprPayload {
-    ASTNode *left_node;
-    ASTNode *right_node;
+    ASTNode* left_node;
+    ASTNode* right_node;
     TokenType operator_type;
 };
 // Payload for a unary expression node
 struct UnaryExprPayload {
-    ASTNode *right;
+    ASTNode* right;
     TokenType operator_type;
 };
 // Payload for a variable declaration node
 struct VarDeclarationPayload {
     std::string_view var_name;
     DataType type_annotation;
-    ASTNode *value;
+    ASTNode* value;
 };
 // Payload for a variable access node
 struct VarAccessPayload {
@@ -87,11 +87,12 @@ struct VarAccessPayload {
 // Payload for an assignment node
 struct AssignmentPayload {
     std::string_view var_name;
-    ASTNode *value;
+    ASTNode* value;
 };
 
 // The master tagged union representing a single node in the syntax tree.
-// It guarantees every node uses the exact same amount of memory for lightning-fast Arena allocation.
+// It guarantees every node uses the exact same amount of memory for lightning-fast Arena
+// allocation.
 struct ASTNode {
     NodeType node_type{};
     size_t line{};
@@ -110,22 +111,25 @@ struct ASTNode {
 struct Arena;
 
 // Factory for signed integer
-ASTNode *create_int_node(size_t line, Arena *arena, int64_t value);
+ASTNode* create_int_node(size_t line, Arena* arena, int64_t value);
 // Factory for unsigned integer
-ASTNode *create_uint_node(size_t line, Arena *arena, uint64_t value);
+ASTNode* create_uint_node(size_t line, Arena* arena, uint64_t value);
 // Factory for floating points
-ASTNode *create_double_node(size_t line, Arena *arena, double value);
+ASTNode* create_double_node(size_t line, Arena* arena, double value);
 // Factory for boolean
-ASTNode *create_boolean_node(size_t line, Arena *arena, bool value);
+ASTNode* create_boolean_node(size_t line, Arena* arena, bool value);
 // Factory for binary expressions
-ASTNode *create_binary_expr_node(size_t line, Arena *arena, ASTNode *left, ASTNode *right, TokenType operator_type);
+ASTNode* create_binary_expr_node(size_t line, Arena* arena, ASTNode* left, ASTNode* right,
+                                 TokenType operator_type);
 // Factory for unary expressions
-ASTNode *create_unary_expr_node(size_t line, Arena *arena, ASTNode *right, TokenType operator_type);
+ASTNode* create_unary_expr_node(size_t line, Arena* arena, ASTNode* right, TokenType operator_type);
 // Variable declaration node
-ASTNode *create_var_declaration_node(size_t line, Arena *arena, std::string_view var_name, DataType type_annotation, ASTNode *value);
+ASTNode* create_var_declaration_node(size_t line, Arena* arena, std::string_view var_name,
+                                     DataType type_annotation, ASTNode* value);
 // Variable access node
-ASTNode *create_var_access_node(size_t line, Arena *arena, std::string_view var_name);
+ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_name);
 // Variable assignment node
-ASTNode *create_assignment_node(size_t line, Arena *arena, std::string_view var_name, ASTNode *value);
+ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name,
+                                ASTNode* value);
 
 #endif

@@ -1,8 +1,8 @@
 #include "ast.hpp"
 #include "arena.hpp"
 // Factory for signed integer
-ASTNode *create_int_node(Arena *arena,const int64_t value) {
-    void *memory = alloc_arena(arena , sizeof(ASTNode));
+ASTNode *create_int_node(Arena *arena, const int64_t value) {
+    void *memory = alloc_arena(arena, sizeof(ASTNode));
     auto *node = static_cast<ASTNode *>(memory);
     node->node_type = NodeType::NUM_LITERAL;
     node->number_literal.number_type = NumberLiteralPayload::NumberType::TYPE_I64;
@@ -10,7 +10,7 @@ ASTNode *create_int_node(Arena *arena,const int64_t value) {
     return node;
 }
 // Factory for unsigned integer
-ASTNode *create_uint_node(Arena *arena,const uint64_t value) {
+ASTNode *create_uint_node(Arena *arena, const uint64_t value) {
     void *memory = alloc_arena(arena, sizeof(ASTNode));
     auto *node = static_cast<ASTNode *>(memory);
     node->node_type = NodeType::NUM_LITERAL;
@@ -19,7 +19,7 @@ ASTNode *create_uint_node(Arena *arena,const uint64_t value) {
     return node;
 }
 // Factory for floating points
-ASTNode *create_double_node(Arena *arena,const double value) {
+ASTNode *create_double_node(Arena *arena, const double value) {
     void *memory = alloc_arena(arena, sizeof(ASTNode));
     auto *node = static_cast<ASTNode *>(memory);
     node->node_type = NodeType::NUM_LITERAL;
@@ -28,7 +28,8 @@ ASTNode *create_double_node(Arena *arena,const double value) {
     return node;
 }
 // Factory for binary expressions
-ASTNode *create_binary_expr_node(Arena *arena, ASTNode *left, ASTNode *right,const TokenType operator_type) {
+ASTNode *create_binary_expr_node(Arena *arena, ASTNode *left, ASTNode *right,
+                                 const TokenType operator_type) {
     void *memory = alloc_arena(arena, sizeof(ASTNode));
     auto *node = static_cast<ASTNode *>(memory);
     node->node_type = NodeType::BINARY_EXPR;

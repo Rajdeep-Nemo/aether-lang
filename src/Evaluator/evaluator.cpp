@@ -73,7 +73,7 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0.0) {
-                    report_runtime_error("Division by zero.");
+                    report_runtime_error(node->line, "Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
@@ -148,7 +148,7 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0) {
-                    report_runtime_error("Division by zero.");
+                    report_runtime_error(node->line, "Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
@@ -223,7 +223,7 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
             }
             case TokenType::SLASH: {
                 if (r_val == 0) {
-                    report_runtime_error("Division by zero.");
+                    report_runtime_error(node->line, "Division by zero.");
                     return RuntimeValue{ValueType::VAL_NIL};
                 }
                 RuntimeValue div{};
@@ -291,14 +291,14 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
                 return res;
             }
             default: {
-                report_runtime_error("Invalid operator for booleans.");
+                report_runtime_error(node->line, "Invalid operator for booleans.");
                 RuntimeValue nil{};
                 nil.type = ValueType::VAL_NIL;
                 return nil;
             }
             }
         }
-        report_runtime_error("Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
+        report_runtime_error(node->line, "Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
         RuntimeValue nil{};
         nil.type = ValueType::VAL_NIL;
         return nil;
@@ -318,7 +318,7 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
             return neg;
         }
         if (right.type == ValueType::VAL_UINT) {
-            report_runtime_error("Cannot apply unary minus to an unsigned integer.");
+            report_runtime_error(node->line, "Cannot apply unary minus to an unsigned integer.");
             return RuntimeValue{ValueType::VAL_NIL};
         }
     }
@@ -341,11 +341,11 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
         return RuntimeValue{ValueType::VAL_NIL};
     }
     if (node->node_type == NodeType::VAR_ACCESS) {
-        return env->get(std::string(node->var_access.var_name));
+        return env->get(std::string(node->var_access.var_name), node->line);
     }
     if (node->node_type == NodeType::ASSIGNMENT_EXPR) {
         RuntimeValue val = evaluate(node->var_assignment.value, env);
-        env->assign(std::string(node->var_assignment.var_name), val);
+        env->assign(std::string(node->var_assignment.var_name), val, node->line);
         return RuntimeValue{ValueType::VAL_NIL};
     }
     return RuntimeValue{ValueType::VAL_NIL};

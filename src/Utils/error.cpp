@@ -1,7 +1,7 @@
 #include "error.hpp"
 #include <iostream>
 
-void report_scan_error(const int line, const std::string_view message) {
+void report_scan_error(const size_t line, const std::string_view message) {
     std::cerr << "[Line " << line << "] Lexer Error: " << message << std::endl;
 }
 
@@ -13,6 +13,6 @@ void report_parser_error(const Token& token,const std::string_view message) {
     }
 }
 
-void report_runtime_error(const std::string_view message) {
-    std::cerr << "Runtime Error: " << message << std::endl;
+void report_runtime_error(const size_t line, const std::string_view message) {
+    std::cerr << "[Line " << line << "] Runtime Error: " << message << std::endl;
 }

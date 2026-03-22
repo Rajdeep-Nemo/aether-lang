@@ -52,7 +52,8 @@ ASTNode *parse_unary(Parser *parser) {
     if (peek(parser).type == TokenType::MINUS) {
         const Token op = advance(parser);
         ASTNode *right = parse_unary(parser);
-        return create_unary_expr_node(parser->arena, right, op.type);
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_unary_expr_node(line, parser->arena, right, op.type);
     }
     return parse_primary(parser);
 }
@@ -68,7 +69,8 @@ ASTNode *parse_comparison(Parser *parser) {
 
         const Token op = advance(parser);
         ASTNode *right = parse_addition_and_subtraction(parser);
-        left = create_binary_expr_node(parser->arena, left, right, op.type);
+        const size_t line = parser->tokens[parser->current_position].line;
+        left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
@@ -77,11 +79,13 @@ ASTNode *parse_primary(Parser *parser) {
     const Token current = peek(parser);
     if (current.type == TokenType::INT_LITERAL) {
         advance(parser);
-        return create_int_node(parser->arena, std::stoll(current.lexeme));
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_int_node(line, parser->arena, std::stoll(current.lexeme));
     }
     if (current.type == TokenType::FLOAT_LITERAL) {
         advance(parser);
-        return create_double_node(parser->arena, std::stod(current.lexeme));
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_double_node(line, parser->arena, std::stod(current.lexeme));
     }
     if (current.type == TokenType::LEFT_PAREN) {
         advance(parser);
@@ -94,16 +98,19 @@ ASTNode *parse_primary(Parser *parser) {
     }
     if (current.type == TokenType::TRUE) {
         advance(parser);
-        return create_boolean_node(parser->arena, true);
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_boolean_node(line, parser->arena, true);
     }
     if (current.type == TokenType::FALSE) {
         advance(parser);
-        return create_boolean_node(parser->arena, false);
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_boolean_node(line, parser->arena, false);
     }
     if (current.type == TokenType::IDENTIFIER) {
         const std::string_view safe_lexeme = parser->tokens[parser->current_position].lexeme;
         advance(parser);
-        return create_var_access_node(parser->arena, safe_lexeme);
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_var_access_node(line, parser->arena, safe_lexeme);
     }
     return nullptr;
 }
@@ -114,7 +121,8 @@ ASTNode *parse_multiplication_and_division(Parser *parser) {
         // "op" is the operator
         const Token op = advance(parser);
         ASTNode *right = parse_unary(parser);
-        left = create_binary_expr_node(parser->arena, left, right, op.type);
+        const size_t line = parser->tokens[parser->current_position].line;
+        left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
@@ -125,7 +133,8 @@ ASTNode *parse_addition_and_subtraction(Parser *parser) {
         // "op" is the operator
         const Token op = advance(parser);
         ASTNode *right = parse_multiplication_and_division(parser);
-        left = create_binary_expr_node(parser->arena, left, right, op.type);
+        const size_t line = parser->tokens[parser->current_position].line;
+        left = create_binary_expr_node(line, parser->arena, left, right, op.type);
     }
     return left;
 }
@@ -164,14 +173,17 @@ ASTNode *parse_statement(Parser *parser) {
             report_parser_error(peek(parser), "Expected ';' at the end of declaration.");
             return nullptr;
         }
-
-        return create_var_declaration_node(parser->arena, name_token.lexeme, var_type, expr);
+        const size_t line = parser->tokens[parser->current_position].line;
+        return create_var_declaration_node(line, parser->arena, name_token.lexeme, var_type, expr);
     }
 
     ASTNode *expr = parse_assignment(parser);
-    // Consumes the last semi-colon
+    // Consumes the last semicolon, if absent throws error
     if (peek(parser).type == TokenType::SEMICOLON) {
         advance(parser);
+    } else {
+        report_parser_error(peek(parser), "Expected ';' at the end of statement.");
+        return nullptr;
     }
     return expr;
 }
@@ -187,7 +199,8 @@ ASTNode *parse_assignment(Parser *parser) {
 
         if (expr != nullptr && expr->node_type == NodeType::VAR_ACCESS) {
             std::string_view var_name = expr->var_access.var_name;
-            return create_assignment_node(parser->arena, var_name, value);
+            const size_t line = parser->tokens[parser->current_position].line;
+            return create_assignment_node(line, parser->arena, var_name, value);
         }
         report_parser_error(peek(parser), "Invalid assignment target.");
         return nullptr;

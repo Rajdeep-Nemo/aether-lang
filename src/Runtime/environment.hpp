@@ -11,8 +11,8 @@ struct Environment {
     Environment *enclosing = nullptr;
 
     void define(const std::string &name, RuntimeValue value);
-    RuntimeValue get(const std::string &name);
-    void assign(const std::string &name, RuntimeValue value);
+    RuntimeValue get(const std::string &name, size_t line);
+    void assign(const std::string &name, RuntimeValue value, size_t line);
 };
 
 #endif

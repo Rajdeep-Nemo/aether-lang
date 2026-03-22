@@ -159,6 +159,8 @@ aether-lang/
 │   │   ├── value.cpp       # Implementation of value types and operations
 │   │   └── value.hpp       # Header for value type definitions
 │   └── Util/
+│       ├── arena.cpp       # Implementation of memory management
+│       ├── arena.hpp       # Header for arena allocation functions
 │       ├── error.cpp       # Implementation of error reporting and handling
 │       └── error.hpp       # Header for error utility functions
 ├── stdlib/

@@ -17,6 +17,7 @@ enum class TokenType {
     CHAR_LITERAL,
     NIL_LITERAL,
     // 3. Keywords
+    LET,
     IF,
     ELSE,
     DO,

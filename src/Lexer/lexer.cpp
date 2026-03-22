@@ -1,21 +1,10 @@
 #include "lexer.hpp"
 #include "token.hpp"
 #include <cassert>
-#include <cstdlib>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <memory>
-static constexpr char empty[] = "";
-// struct to iterate through the source code
-struct Scanner {
-    std::string source;
-    const char *start = empty;
-    const char *current = empty;
-    std::size_t line{};
-};
-// Instance created
-static Scanner scanner;
 // Function to initialize our scanner
 void init_scanner(std::string src) {
     scanner.source = std::move(src);
@@ -24,25 +13,25 @@ void init_scanner(std::string src) {
     scanner.line = 1;
 }
 // Function that checks if we read the complete file or not
-bool is_at_end() {
+static bool is_at_end() {
     if (*scanner.current == '\0') {
         return true;
     }
     return false;
 }
 // Function that moves the pointer 'current' forward
-char advance() {
+static char advance() {
     if (is_at_end()) {
         return '\0';
     }
     return *scanner.current++;
 }
 // Function to check the next character
-char peek() {
+static char peek() {
     return *scanner.current;
 }
 // Function to check the second next character
-char peek_next() {
+static char peek_next() {
     if (*scanner.current == '\0') {
         return '\0';
     }
@@ -87,7 +76,7 @@ Token create_token(const TokenType token_type) {
     return token;
 }
 // Function for error reporting
-Token error_token(const char *message) {
+Token error_token(const char* message) {
     Token token;
     token.type = TokenType::ERROR_TOKEN;
     token.lexeme = std::string(message);
@@ -95,7 +84,7 @@ Token error_token(const char *message) {
     return token;
 }
 // Function to read input file into a buffer
-std::string read_file(const char *path) {
+std::string read_file(const char* path) {
     // Opens the file
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     // Checks if the file exists
@@ -250,7 +239,7 @@ static Token is_number_literal() {
     return create_token(isFloat ? TokenType::FLOAT_LITERAL : TokenType::INT_LITERAL);
 }
 // Helper to check keyword
-TokenType check_keyword(const int start, const int length, const char *rest, const TokenType type) {
+TokenType check_keyword(const int start, const int length, const char* rest, const TokenType type) {
     if (scanner.current - scanner.start == start + length &&
         std::string_view(scanner.start + start, length) == rest) {
         return type;
@@ -356,9 +345,18 @@ static TokenType identifier_type() {
             }
         }
         break;
-        // Check loop
+        // Check loop and let
     case 'l':
-        return check_keyword(1, 3, "oop", TokenType::LOOP);
+        if (scanner.current - scanner.start > 1) {
+            switch (scanner.start[1]) {
+            case 'o':
+                return check_keyword(2, 2, "op", TokenType::LOOP);
+            case 'e':
+                return check_keyword(2, 1, "t", TokenType::LET);
+            default:;
+            }
+        }
+        break;
         // Check match
     case 'm':
         return check_keyword(1, 4, "atch", TokenType::MATCH);
@@ -526,22 +524,8 @@ Token scan_token() {
         return error_token("Unexpected character.");
     }
 }
-// Checks the next token without consuming the current one
-Token peek_token() {
-    const char *saved_start = scanner.start;
-    const char *saved_current = scanner.current;
-    std::size_t saved_line = scanner.line;
-
-    Token t = scan_token();
-
-    scanner.start = saved_start;
-    scanner.current = saved_current;
-    scanner.line = saved_line;
-
-    return t;
-}
 // Function to manage the process
-bool run_file(const char *path) {
+bool run_file(const char* path) {
     std::ifstream test(path);
     if (!test) {
         std::cerr << "File not found: " << path << '\n';

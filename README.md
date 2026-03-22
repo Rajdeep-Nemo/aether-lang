@@ -142,8 +142,8 @@ aether-lang/
 │   │   ├── builtin.cpp     # Implementation of built-in functions and operations
 │   │   └── builtin.hpp     # Header for built-in function declarations
 │   ├── Interpreter/
-│   │   ├── interpreter.cpp # Core interpreter logic for executing Aether code
-│   │   └── interpreter.hpp # Header for interpreter functions and execution context
+│   │   ├── evaluator.cpp # Core interpreter logic for executing Aether code
+│   │   └── evaluator.hpp # Header for interpreter functions and execution context
 │   ├── Lexer/
 │   │   ├── lexer.cpp       # Implementation of lexical analysis (tokenization)
 │   │   ├── lexer.hpp       # Header for lexer functions and token scanning
@@ -159,6 +159,8 @@ aether-lang/
 │   │   ├── value.cpp       # Implementation of value types and operations
 │   │   └── value.hpp       # Header for value type definitions
 │   └── Util/
+│       ├── arena.cpp       # Implementation of memory management
+│       ├── arena.hpp       # Header for arena allocation functions
 │       ├── error.cpp       # Implementation of error reporting and handling
 │       └── error.hpp       # Header for error utility functions
 ├── stdlib/

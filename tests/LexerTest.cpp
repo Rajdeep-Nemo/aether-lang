@@ -10,7 +10,7 @@ class LexerTest : public ::testing::Test {
         // Setup code if needed
     }
 
-    static std::vector<Token> tokenize(const std::string &source) {
+    static std::vector<Token> tokenize(const std::string& source) {
         init_scanner(source);
         std::vector<Token> tokens;
 
@@ -461,7 +461,7 @@ TEST_F(LexerTest, ComplexExpression) {
     bool found_int = false, found_plus = false, found_float = false;
     bool found_semicolon = false, found_return = false, found_right_brace = false;
 
-    for (const auto &token : tokens) {
+    for (const auto& token : tokens) {
         if (token.type == TokenType::FN)
             found_fn = true;
         if (token.type == TokenType::IDENTIFIER && token.lexeme == "add")

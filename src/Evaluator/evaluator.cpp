@@ -1,6 +1,6 @@
 #include "evaluator.hpp"
-#include "environment.hpp"
 #include "ast.hpp"
+#include "environment.hpp"
 #include "error.hpp"
 
 RuntimeValue evaluate(const ASTNode *node, Environment *env) {
@@ -298,7 +298,9 @@ RuntimeValue evaluate(const ASTNode *node, Environment *env) {
             }
             }
         }
-        report_runtime_error(node->line, "Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
+        report_runtime_error(
+            node->line,
+            "Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
         RuntimeValue nil{};
         nil.type = ValueType::VAL_NIL;
         return nil;

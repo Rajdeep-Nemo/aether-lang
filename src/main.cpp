@@ -1,9 +1,9 @@
 #include "AST/ast.hpp"
 #include "Evaluator/evaluator.hpp"
-#include "Runtime/environment.hpp"
-#include "Runtime/value.hpp"
 #include "Lexer/lexer.hpp"
 #include "Parser/parser.hpp"
+#include "Runtime/environment.hpp"
+#include "Runtime/value.hpp"
 #include "Utils/arena.hpp"
 #include <format>
 #include <iostream>

@@ -1,5 +1,5 @@
-#include "error.hpp"
 #include "parser.hpp"
+#include "error.hpp"
 #include "token.hpp"
 // Checks the next token without consuming the current one
 Token peek(Parser *parser) {
@@ -27,20 +27,34 @@ bool is_at_end(const Parser *parser) {
 // Returns the DataType corresponding to the TokenType
 DataType get_data_type(const TokenType type) {
     switch (type) {
-    case TokenType::I8: return DataType::TYPE_I8;
-    case TokenType::I16: return DataType::TYPE_I16;
-    case TokenType::I32: return DataType::TYPE_I32;
-    case TokenType::I64: return DataType::TYPE_I64;
-    case TokenType::U8: return DataType::TYPE_U8;
-    case TokenType::U16: return DataType::TYPE_U16;
-    case TokenType::U32: return DataType::TYPE_U32;
-    case TokenType::U64: return DataType::TYPE_U64;
-    case TokenType::F32: return DataType::TYPE_F32;
-    case TokenType::F64: return DataType::TYPE_F64;
-    case TokenType::BOOL: return DataType::TYPE_BOOL;
-    case TokenType::CHAR: return DataType::TYPE_CHAR;
-    case TokenType::STRING: return DataType::TYPE_STRING;
-    default: return DataType::TYPE_UNKNOWN; // Fallback
+    case TokenType::I8:
+        return DataType::TYPE_I8;
+    case TokenType::I16:
+        return DataType::TYPE_I16;
+    case TokenType::I32:
+        return DataType::TYPE_I32;
+    case TokenType::I64:
+        return DataType::TYPE_I64;
+    case TokenType::U8:
+        return DataType::TYPE_U8;
+    case TokenType::U16:
+        return DataType::TYPE_U16;
+    case TokenType::U32:
+        return DataType::TYPE_U32;
+    case TokenType::U64:
+        return DataType::TYPE_U64;
+    case TokenType::F32:
+        return DataType::TYPE_F32;
+    case TokenType::F64:
+        return DataType::TYPE_F64;
+    case TokenType::BOOL:
+        return DataType::TYPE_BOOL;
+    case TokenType::CHAR:
+        return DataType::TYPE_CHAR;
+    case TokenType::STRING:
+        return DataType::TYPE_STRING;
+    default:
+        return DataType::TYPE_UNKNOWN; // Fallback
     }
 }
 // Parse the tokens into AST
@@ -61,10 +75,8 @@ ASTNode *parse_unary(Parser *parser) {
 ASTNode *parse_comparison(Parser *parser) {
     ASTNode *left = parse_addition_and_subtraction(parser);
     while (peek(parser).type == TokenType::EQUAL_EQUAL ||
-           peek(parser).type == TokenType::BANG_EQUAL ||
-           peek(parser).type == TokenType::LESS ||
-           peek(parser).type == TokenType::LESS_EQUAL ||
-           peek(parser).type == TokenType::GREATER ||
+           peek(parser).type == TokenType::BANG_EQUAL || peek(parser).type == TokenType::LESS ||
+           peek(parser).type == TokenType::LESS_EQUAL || peek(parser).type == TokenType::GREATER ||
            peek(parser).type == TokenType::GREATER_EQUAL) {
 
         const Token op = advance(parser);
@@ -143,7 +155,7 @@ ASTNode *parse_statement(Parser *parser) {
     if (peek(parser).type == TokenType::LET) {
         advance(parser);
 
-        const Token& name_token = parser->tokens[parser->current_position];
+        const Token &name_token = parser->tokens[parser->current_position];
         advance(parser);
 
         if (peek(parser).type == TokenType::COLON) {

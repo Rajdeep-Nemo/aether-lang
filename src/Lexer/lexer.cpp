@@ -349,8 +349,10 @@ static TokenType identifier_type() {
     case 'l':
         if (scanner.current - scanner.start > 1) {
             switch (scanner.start[1]) {
-            case 'o': return check_keyword(2, 2, "op", TokenType::LOOP);
-            case 'e': return check_keyword(2, 1, "t", TokenType::LET);
+            case 'o':
+                return check_keyword(2, 2, "op", TokenType::LOOP);
+            case 'e':
+                return check_keyword(2, 1, "t", TokenType::LET);
             default:;
             }
         }

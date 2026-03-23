@@ -218,7 +218,7 @@ ASTNode* parse_statement(Parser* parser) {
         if (peek(parser).type == TokenType::SEMICOLON) {
             advance(parser);
         } else {
-            report_parser_error(peek(parser), "Expected ';' at the end of declaration.");
+            report_parser_error(peek(parser), "Multiple declarations on a single line are not allowed");
             return nullptr;
         }
         const size_t line = parser->tokens[parser->current_position].line;

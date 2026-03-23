@@ -19,8 +19,7 @@ Token advance(Parser* parser) {
 }
 // Function to check if the current token matches the expected token type
 bool is_at_end(const Parser* parser) {
-    if (parser->current_position >= parser->tokens.size() ||
-        parser->tokens[parser->current_position].type == TokenType::END_OF_FILE) {
+    if (parser->current_position >= parser->tokens.size() || parser->tokens[parser->current_position].type == TokenType::END_OF_FILE) {
         return true;
     }
     return false;
@@ -75,10 +74,8 @@ ASTNode* parse_unary(Parser* parser) {
 // Parses comparison
 ASTNode* parse_comparison(Parser* parser) {
     ASTNode* left = parse_addition_and_subtraction(parser);
-    while (peek(parser).type == TokenType::EQUAL_EQUAL ||
-           peek(parser).type == TokenType::BANG_EQUAL || peek(parser).type == TokenType::LESS ||
-           peek(parser).type == TokenType::LESS_EQUAL || peek(parser).type == TokenType::GREATER ||
-           peek(parser).type == TokenType::GREATER_EQUAL) {
+    while (peek(parser).type == TokenType::EQUAL_EQUAL || peek(parser).type == TokenType::BANG_EQUAL || peek(parser).type == TokenType::LESS ||
+           peek(parser).type == TokenType::LESS_EQUAL || peek(parser).type == TokenType::GREATER || peek(parser).type == TokenType::GREATER_EQUAL) {
 
         const Token op = advance(parser);
         ASTNode* right = parse_addition_and_subtraction(parser);
@@ -87,18 +84,18 @@ ASTNode* parse_comparison(Parser* parser) {
     }
     return left;
 }
-// Parses a number literal and parentheses - '(' and ')'
+// Parses leaf nodes
 ASTNode* parse_primary(Parser* parser) {
-    const Token current = peek(parser);
+
+    const Token& current = parser->tokens[parser->current_position];
+
     if (current.type == TokenType::INT_LITERAL) {
         advance(parser);
-        const size_t line = parser->tokens[parser->current_position].line;
-        return create_int_node(line, parser->arena, std::stoll(current.lexeme));
+        return create_int_node(current.line, parser->arena, std::stoll(current.lexeme));
     }
     if (current.type == TokenType::FLOAT_LITERAL) {
         advance(parser);
-        const size_t line = parser->tokens[parser->current_position].line;
-        return create_double_node(line, parser->arena, std::stod(current.lexeme));
+        return create_double_node(current.line, parser->arena, std::stod(current.lexeme));
     }
     if (current.type == TokenType::LEFT_PAREN) {
         advance(parser);
@@ -111,19 +108,19 @@ ASTNode* parse_primary(Parser* parser) {
     }
     if (current.type == TokenType::TRUE) {
         advance(parser);
-        const size_t line = parser->tokens[parser->current_position].line;
-        return create_boolean_node(line, parser->arena, true);
+        return create_boolean_node(current.line, parser->arena, true);
     }
     if (current.type == TokenType::FALSE) {
         advance(parser);
-        const size_t line = parser->tokens[parser->current_position].line;
-        return create_boolean_node(line, parser->arena, false);
+        return create_boolean_node(current.line, parser->arena, false);
     }
     if (current.type == TokenType::IDENTIFIER) {
-        const std::string_view safe_lexeme = parser->tokens[parser->current_position].lexeme;
         advance(parser);
-        const size_t line = parser->tokens[parser->current_position].line;
-        return create_var_access_node(line, parser->arena, safe_lexeme);
+        return create_var_access_node(current.line, parser->arena, current.lexeme);
+    }
+    if (peek(parser).type == TokenType::STRING_LITERAL) {
+        advance(parser);
+        return create_string_node(parser->arena, current.lexeme, current.line);
     }
     return nullptr;
 }
@@ -152,14 +149,14 @@ ASTNode* parse_addition_and_subtraction(Parser* parser) {
     return left;
 }
 // Parses a block
-ASTNode* parse_block(Parser *parser) {
+ASTNode* parse_block(Parser* parser) {
     const size_t line = parser->tokens[parser->current_position].line;
     advance(parser); // Consume the '{'
 
     std::vector<ASTNode*> statements;
 
     while (peek(parser).type != TokenType::RIGHT_BRACE && !is_at_end(parser)) {
-        ASTNode *stmt = parse_statement(parser);
+        ASTNode* stmt = parse_statement(parser);
         if (stmt != nullptr) {
             statements.push_back(stmt);
         }
@@ -172,9 +169,7 @@ ASTNode* parse_block(Parser *parser) {
         return nullptr;
     }
 
-    auto **arena_statements = static_cast<ASTNode**>(
-        alloc_arena(parser->arena, statements.size() * sizeof(ASTNode*))
-    );
+    auto** arena_statements = static_cast<ASTNode**>(alloc_arena(parser->arena, statements.size() * sizeof(ASTNode*)));
 
     for (size_t i = 0; i < statements.size(); ++i) {
         arena_statements[i] = statements[i];

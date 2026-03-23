@@ -1,7 +1,7 @@
 #include "ast.hpp"
 #include "arena.hpp"
 // Factory for signed integer
-ASTNode* create_int_node(size_t line, Arena* arena, const int64_t value) {
+ASTNode* create_int_node(const size_t line, Arena* arena, const int64_t value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::NUM_LITERAL;
@@ -11,7 +11,7 @@ ASTNode* create_int_node(size_t line, Arena* arena, const int64_t value) {
     return node;
 }
 // Factory for unsigned integer
-ASTNode* create_uint_node(size_t line, Arena* arena, const uint64_t value) {
+ASTNode* create_uint_node(const size_t line, Arena* arena, const uint64_t value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::NUM_LITERAL;
@@ -21,7 +21,7 @@ ASTNode* create_uint_node(size_t line, Arena* arena, const uint64_t value) {
     return node;
 }
 // Factory for floating points
-ASTNode* create_double_node(size_t line, Arena* arena, const double value) {
+ASTNode* create_double_node(const size_t line, Arena* arena, const double value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::NUM_LITERAL;
@@ -30,8 +30,17 @@ ASTNode* create_double_node(size_t line, Arena* arena, const double value) {
     node->line = line;
     return node;
 }
+// Factory for string literals
+ASTNode* create_string_node(Arena *arena,const std::string_view value,const size_t line) {
+    void* memory = alloc_arena(arena, sizeof(ASTNode));
+    auto* node = static_cast<ASTNode *>(memory);
+    node->node_type = NodeType::STRING_LITERAL;
+    node->line = line;
+    node->string_literal.value = value;
+    return node;
+}
 // Factory for boolean
-ASTNode* create_boolean_node(size_t line, Arena* arena, const bool value) {
+ASTNode* create_boolean_node(const size_t line, Arena* arena, const bool value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::BOOLEAN_LITERAL;
@@ -40,8 +49,7 @@ ASTNode* create_boolean_node(size_t line, Arena* arena, const bool value) {
     return node;
 }
 // Factory for binary expressions
-ASTNode* create_binary_expr_node(size_t line, Arena* arena, ASTNode* left, ASTNode* right,
-                                 const TokenType operator_type) {
+ASTNode* create_binary_expr_node(const size_t line, Arena* arena, ASTNode* left, ASTNode* right, const TokenType operator_type) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::BINARY_EXPR;
@@ -52,8 +60,7 @@ ASTNode* create_binary_expr_node(size_t line, Arena* arena, ASTNode* left, ASTNo
     return node;
 }
 // Factory for unary expressions
-ASTNode* create_unary_expr_node(size_t line, Arena* arena, ASTNode* right,
-                                TokenType operator_type) {
+ASTNode* create_unary_expr_node(const size_t line, Arena* arena, ASTNode* right,const  TokenType operator_type) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::UNARY_EXPR;
@@ -63,8 +70,7 @@ ASTNode* create_unary_expr_node(size_t line, Arena* arena, ASTNode* right,
     return node;
 }
 // Variable declaration
-ASTNode* create_var_declaration_node(size_t line, Arena* arena, const std::string_view var_name,
-                                     const DataType type_annotation, ASTNode* value) {
+ASTNode* create_var_declaration_node(const size_t line, Arena* arena, const std::string_view var_name, const DataType type_annotation, ASTNode* value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::VAR_DECLARATION;
@@ -75,7 +81,7 @@ ASTNode* create_var_declaration_node(size_t line, Arena* arena, const std::strin
     return node;
 }
 // Variable access node
-ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_name) {
+ASTNode* create_var_access_node(const size_t line, Arena* arena,const  std::string_view var_name) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::VAR_ACCESS;
@@ -84,7 +90,7 @@ ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_
     return node;
 }
 // Variable assignment node
-ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name, ASTNode* value) {
+ASTNode* create_assignment_node(const size_t line, Arena* arena,const  std::string_view var_name, ASTNode* value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::ASSIGNMENT_EXPR;
@@ -94,7 +100,7 @@ ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_
     return node;
 }
 // Block node
-ASTNode* create_block_node(Arena* arena, ASTNode** statements, size_t count, size_t line) {
+ASTNode* create_block_node(Arena* arena, ASTNode** statements,const  size_t count,const  size_t line) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::BLOCK_STATEMENT;

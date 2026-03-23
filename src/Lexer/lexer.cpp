@@ -240,8 +240,7 @@ static Token is_number_literal() {
 }
 // Helper to check keyword
 TokenType check_keyword(const int start, const int length, const char* rest, const TokenType type) {
-    if (scanner.current - scanner.start == start + length &&
-        std::string_view(scanner.start + start, length) == rest) {
+    if (scanner.current - scanner.start == start + length && std::string_view(scanner.start + start, length) == rest) {
         return type;
     }
     return TokenType::IDENTIFIER;

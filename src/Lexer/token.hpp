@@ -101,7 +101,7 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string lexeme;
-    std::size_t line;
+    size_t line;
 };
 
 #endif // TOKEN_HPP

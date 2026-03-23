@@ -35,6 +35,12 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
         const RuntimeValue left_val = evaluate(node->binary_expr.left_node, env);
         const RuntimeValue right_val = evaluate(node->binary_expr.right_node, env);
 
+        // If either side is NIL, an error was already reported (like an undefined variable).
+        // Fail silently and pass the NIL up the chain.
+        if (left_val.type == ValueType::VAL_NIL || right_val.type == ValueType::VAL_NIL) {
+            return RuntimeValue{ValueType::VAL_NIL};
+        }
+
         if (left_val.type == ValueType::VAL_FLOAT || right_val.type == ValueType::VAL_FLOAT) {
             double l_val = 0.0;
             if (left_val.type == ValueType::VAL_FLOAT) {
@@ -348,6 +354,17 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
     if (node->node_type == NodeType::ASSIGNMENT_EXPR) {
         RuntimeValue val = evaluate(node->var_assignment.value, env);
         env->assign(std::string(node->var_assignment.var_name), val, node->line);
+        return RuntimeValue{ValueType::VAL_NIL};
+    }
+    if (node->node_type == NodeType::BLOCK_STATEMENT) {
+        Environment block_env(env);
+
+        for (size_t i = 0; i < node->block_statement.count; ++i) {
+            evaluate(node->block_statement.statements[i], &block_env);
+        }
+
+        // When this 'if' block ends, C++ automatically destroys 'block_env',
+        // taking all local variables with it.
         return RuntimeValue{ValueType::VAL_NIL};
     }
     return RuntimeValue{ValueType::VAL_NIL};

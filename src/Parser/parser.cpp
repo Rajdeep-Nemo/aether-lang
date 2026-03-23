@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "error.hpp"
 #include "token.hpp"
+#include <vector>
 // Checks the next token without consuming the current one
 Token peek(Parser* parser) {
     if (is_at_end(parser)) {
@@ -150,8 +151,43 @@ ASTNode* parse_addition_and_subtraction(Parser* parser) {
     }
     return left;
 }
+// Parses a block
+ASTNode* parse_block(Parser *parser) {
+    const size_t line = parser->tokens[parser->current_position].line;
+    advance(parser); // Consume the '{'
+
+    std::vector<ASTNode*> statements;
+
+    while (peek(parser).type != TokenType::RIGHT_BRACE && !is_at_end(parser)) {
+        ASTNode *stmt = parse_statement(parser);
+        if (stmt != nullptr) {
+            statements.push_back(stmt);
+        }
+    }
+
+    if (peek(parser).type == TokenType::RIGHT_BRACE) {
+        advance(parser); // Consume the '}'
+    } else {
+        report_parser_error(peek(parser), "Expected '}' at the end of block.");
+        return nullptr;
+    }
+
+    auto **arena_statements = static_cast<ASTNode**>(
+        alloc_arena(parser->arena, statements.size() * sizeof(ASTNode*))
+    );
+
+    for (size_t i = 0; i < statements.size(); ++i) {
+        arena_statements[i] = statements[i];
+    }
+
+    return create_block_node(parser->arena, arena_statements, statements.size(), line);
+}
 // Parses a statement
 ASTNode* parse_statement(Parser* parser) {
+    if (peek(parser).type == TokenType::LEFT_BRACE) {
+        return parse_block(parser);
+    }
+
     if (peek(parser).type == TokenType::LET) {
         advance(parser);
 

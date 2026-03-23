@@ -84,13 +84,22 @@ ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_
     return node;
 }
 // Variable assignment node
-ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name,
-                                ASTNode* value) {
+ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name, ASTNode* value) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::ASSIGNMENT_EXPR;
     node->var_assignment.var_name = var_name;
     node->var_assignment.value = value;
     node->line = line;
+    return node;
+}
+// Block node
+ASTNode* create_block_node(Arena* arena, ASTNode** statements, size_t count, size_t line) {
+    void* memory = alloc_arena(arena, sizeof(ASTNode));
+    auto* node = static_cast<ASTNode*>(memory);
+    node->node_type = NodeType::BLOCK_STATEMENT;
+    node->line = line;
+    node->block_statement.statements = statements;
+    node->block_statement.count = count;
     return node;
 }

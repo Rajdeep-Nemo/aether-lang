@@ -2,6 +2,12 @@
 #include "ast.hpp"
 #include "environment.hpp"
 #include "error.hpp"
+#include <vector>
+#include <string>
+//To be removed------------------------------------------1
+// Global pool to track dynamically allocated strings
+std::vector<std::string*> string_pool;
+//-------------------------------------------------------1
 
 RuntimeValue evaluate(const ASTNode* node, Environment* env) {
     if (node == nullptr) {
@@ -30,6 +36,17 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
         runtime_boolean.type = ValueType::VAL_BOOLEAN;
         runtime_boolean.b = node->boolean_literal.value;
         return runtime_boolean;
+    }
+    if (node->node_type == NodeType::STRING_LITERAL) {
+        RuntimeValue val{};
+        val.type = ValueType::VAL_STRING;
+
+        auto new_str = new std::string(node->string_literal.value);
+        // Add it to our garbage collection pool
+        string_pool.push_back(new_str);
+
+        val.str_ptr = new_str;
+        return val;
     }
     if (node->node_type == NodeType::BINARY_EXPR) {
         const RuntimeValue left_val = evaluate(node->binary_expr.left_node, env);
@@ -304,9 +321,7 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
             }
             }
         }
-        report_runtime_error(
-            node->line,
-            "Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
+        report_runtime_error(node->line, "Type mismatch. Cannot implicitly mix signed and unsigned integers. Cast explicitly.");
         RuntimeValue nil{};
         nil.type = ValueType::VAL_NIL;
         return nil;

@@ -12,6 +12,7 @@ struct ASTNode;
 enum class NodeType {
     NUM_LITERAL,
     BOOLEAN_LITERAL,
+    STRING_LITERAL,
     BINARY_EXPR,
     UNARY_EXPR,
     VAR_DECLARATION,
@@ -39,18 +40,7 @@ enum class DataType {
 // Payload for a number literal node
 struct NumberLiteralPayload {
     // Enum to specify the type of the number
-    enum class NumberType {
-        TYPE_I8,
-        TYPE_I16,
-        TYPE_I32,
-        TYPE_I64,
-        TYPE_U8,
-        TYPE_U16,
-        TYPE_U32,
-        TYPE_U64,
-        TYPE_F32,
-        TYPE_F64
-    };
+    enum class NumberType { TYPE_I8, TYPE_I16, TYPE_I32, TYPE_I64, TYPE_U8, TYPE_U16, TYPE_U32, TYPE_U64, TYPE_F32, TYPE_F64 };
     // Union to store the number value
     union {
         int64_t i;
@@ -63,6 +53,10 @@ struct NumberLiteralPayload {
 // Payload for a boolean literal node
 struct BooleanLiteralPayload {
     bool value;
+};
+// Payload for a string literal node
+struct StringPayload {
+    std::string_view value;
 };
 // Payload for a binary expression node
 struct BinaryExprPayload {
@@ -104,6 +98,7 @@ struct ASTNode {
     union {
         NumberLiteralPayload number_literal;
         BooleanLiteralPayload boolean_literal;
+        StringPayload string_literal;
         BinaryExprPayload binary_expr;
         UnaryExprPayload unary_expr;
         VarDeclarationPayload var_declaration{};
@@ -122,6 +117,8 @@ ASTNode* create_int_node(size_t line, Arena* arena, int64_t value);
 ASTNode* create_uint_node(size_t line, Arena* arena, uint64_t value);
 // Factory for floating points
 ASTNode* create_double_node(size_t line, Arena* arena, double value);
+// Factory for strings
+ASTNode* create_string_node(Arena* arena, std::string_view value, size_t line);
 // Factory for boolean
 ASTNode* create_boolean_node(size_t line, Arena* arena, bool value);
 // Factory for binary expressions
@@ -135,6 +132,6 @@ ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_
 // Variable assignment node
 ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name, ASTNode* value);
 // Block node
-ASTNode* create_block_node(Arena *arena, ASTNode **statements, size_t count, size_t line);
+ASTNode* create_block_node(Arena* arena, ASTNode** statements, size_t count, size_t line);
 
 #endif

@@ -8,7 +8,9 @@
 #include <format>
 #include <iostream>
 #include <vector>
-
+// To be removed ------------------------------------1
+extern std::vector<std::string*> string_pool;
+//-------------------------------------------------1
 int main(const int argc, char* argv[]) {
     if (argc == 1) {
         std::cout << "No input file provided.\n";
@@ -59,6 +61,9 @@ int main(const int argc, char* argv[]) {
             case ValueType::VAL_FLOAT:
                 std::cout << result.f << '\n';
                 break;
+            case ValueType::VAL_STRING:
+                std::cout << *result.str_ptr << '\n';
+                break;
             case ValueType::VAL_BOOLEAN:
                 std::cout << (result.b ? "true" : "false") << '\n';
                 break;
@@ -72,6 +77,13 @@ int main(const int argc, char* argv[]) {
         }
         // Arena deallocation
         free_arena(&start_arena);
+        // To be removed after proper garbage collector implementation----------------2
+        // Clean up all dynamically allocated Aether strings!
+        for (std::string* str : string_pool) {
+            delete str;
+        }
+        string_pool.clear();
+        //-------------------------------------------------------------------------2
         return 0;
     }
     if (argc > 2) {

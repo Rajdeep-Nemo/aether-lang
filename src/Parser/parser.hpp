@@ -31,7 +31,7 @@ ASTNode* parse_multiplication_and_division(Parser* parser);
 // Parses + and -
 ASTNode* parse_addition_and_subtraction(Parser* parser);
 // Parses a block
-ASTNode *parse_block(Parser *parser);
+ASTNode* parse_block(Parser* parser);
 // Parses a statement
 ASTNode* parse_statement(Parser* parser);
 // Parses an assignment

@@ -23,6 +23,7 @@ set(AETHER_LIB_SOURCES
     src/Runtime/value.cpp
     src/Utils/error.cpp
     src/Utils/arena.cpp
+    src/Utils/io.cpp
 )
 
 # Main executable source

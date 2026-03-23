@@ -9,8 +9,8 @@ bool match_tag(const std::string& tag, ValueType type);
 void print_raw_value(const RuntimeValue& val);
 
 // The actual native functions
-RuntimeValue builtin_print(const std::vector<RuntimeValue>& args);
-RuntimeValue builtin_println(const std::vector<RuntimeValue>& args);
+RuntimeValue builtin_print(const std::vector<RuntimeValue>& args, size_t line);
+RuntimeValue builtin_println(const std::vector<RuntimeValue>& args, size_t line);
 
 
 #endif // BUILTINS_HPP

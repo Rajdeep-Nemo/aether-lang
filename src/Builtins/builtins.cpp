@@ -1,4 +1,5 @@
 #include "builtins.hpp"
+#include "Utils/error.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -51,25 +52,25 @@ void print_raw_value(const RuntimeValue& val) {
             std::cout << (val.b ? "true" : "false"); break;
 
         case ValueType::VAL_NIL:
-            std::cout << "nil"; break;
+            std::cout << "NIL"; break;
 
         default:
             std::cout << "<unknown>"; break;
     }
 }
 
-RuntimeValue builtin_print(const std::vector<RuntimeValue>& args) {
-    RuntimeValue nil_val{};
-    nil_val.type = ValueType::VAL_NIL;
+RuntimeValue builtin_print(const std::vector<RuntimeValue>& args, size_t line) {
+    RuntimeValue nil{};
+    nil.type = ValueType::VAL_NIL;
 
-    if (args.empty()) return nil_val;
+    if (args.empty()) return nil;
 
     // If the first argument isn't a string, just print it normally (fallback)
     if (args[0].type != ValueType::VAL_STRING) {
         for (const auto& arg : args) {
             print_raw_value(arg);
         }
-        return nil_val;
+        return nil;
     }
 
     std::string format_str = *(args[0].str_ptr);
@@ -79,8 +80,8 @@ RuntimeValue builtin_print(const std::vector<RuntimeValue>& args) {
         if (format_str[i] == '{') {
             size_t end_brace = format_str.find('}', i);
             if (end_brace == std::string::npos) {
-                std::cerr << "\nRuntime Error: Unmatched '{' in format string.\n";
-                exit(1);
+                report_runtime_error(line, "Unmatched '{' in format string.");
+                return nil;
             }
 
             // Extract the tag (e.g., "i32" from "{i32}")
@@ -88,14 +89,14 @@ RuntimeValue builtin_print(const std::vector<RuntimeValue>& args) {
 
             // Check if user forgot to pass enough arguments
             if (arg_index >= args.size()) {
-                std::cerr << "\nRuntime Error: Not enough arguments for print format.\n";
-                exit(1);
+                report_runtime_error(line, "Not enough arguments for print format.");
+                return nil;
             }
 
             // STRICT TYPE CHECK
             if (!match_tag(tag, args[arg_index].type)) {
-                std::cerr << "\nRuntime Error: Type mismatch. Expected {" << tag << "} but got a different type.\n";
-                exit(1);
+                report_runtime_error(line, "Type mismatch. Expected {" + tag + "} but got a different type.");
+                return nil;
             }
 
             // If it passed the check, print it!
@@ -109,15 +110,15 @@ RuntimeValue builtin_print(const std::vector<RuntimeValue>& args) {
         }
     }
 
-    return nil_val;
+    return nil;
 }
 
 // println is just print + a newline!
-RuntimeValue builtin_println(const std::vector<RuntimeValue>& args) {
-    builtin_print(args);
+RuntimeValue builtin_println(const std::vector<RuntimeValue>& args, size_t line) {
+    builtin_print(args, line);
     std::cout << std::endl;
 
-    RuntimeValue nil_val{};
-    nil_val.type = ValueType::VAL_NIL;
-    return nil_val;
+    RuntimeValue nil{};
+    nil.type = ValueType::VAL_NIL;
+    return nil;
 }

@@ -16,7 +16,7 @@ enum class ValueType {
 };
 
 struct RuntimeValue;
-using NativeFn = RuntimeValue (*)(const std::vector<RuntimeValue>& args);
+using NativeFn = RuntimeValue (*)(const std::vector<RuntimeValue>& args, size_t line);
 
 struct RuntimeValue {
     ValueType type;

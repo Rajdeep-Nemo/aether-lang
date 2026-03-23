@@ -36,6 +36,10 @@ ASTNode* parse_block(Parser* parser);
 ASTNode* parse_statement(Parser* parser);
 // Parses an assignment
 ASTNode* parse_assignment(Parser* parser);
+// Parses function calls like get_func()()
+ASTNode* parse_call(Parser* parser);
+// Helper to parse the arguments inside the parentheses
+ASTNode* finish_call(Parser* parser, ASTNode* callee);
 // Synchronize the parser after a syntax error (Heart attack stopper)
 void synchronize(Parser* parser);
 

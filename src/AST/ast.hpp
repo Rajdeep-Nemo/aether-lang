@@ -18,7 +18,8 @@ enum class NodeType {
     VAR_DECLARATION,
     VAR_ACCESS,
     ASSIGNMENT_EXPR,
-    BLOCK_STATEMENT
+    BLOCK_STATEMENT,
+    FUNCTION_CALL
 };
 // Stores the type of the data
 enum class DataType {
@@ -84,11 +85,18 @@ struct AssignmentPayload {
     std::string_view var_name;
     ASTNode* value;
 };
-
+// Payload for a block node
 struct BlockPayload {
     ASTNode** statements;
     size_t count;
 };
+// Payload for a function call node
+struct FunctionCallPayload {
+    ASTNode* callee;
+    ASTNode** arguments;
+    size_t arg_count;
+};
+
 // The master tagged union representing a single node in the syntax tree.
 // It guarantees every node uses the exact same amount of memory for lightning-fast Arena
 // allocation.
@@ -105,6 +113,7 @@ struct ASTNode {
         VarAccessPayload var_access;
         AssignmentPayload var_assignment;
         BlockPayload block_statement;
+        FunctionCallPayload function_call;
     };
 };
 
@@ -133,5 +142,7 @@ ASTNode* create_var_access_node(size_t line, Arena* arena, std::string_view var_
 ASTNode* create_assignment_node(size_t line, Arena* arena, std::string_view var_name, ASTNode* value);
 // Block node
 ASTNode* create_block_node(Arena* arena, ASTNode** statements, size_t count, size_t line);
+// Function call node
+ASTNode* create_function_call_node(size_t line, Arena* arena, ASTNode* callee, ASTNode** arguments, size_t arg_count);
 
 #endif

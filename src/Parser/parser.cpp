@@ -69,7 +69,7 @@ ASTNode* parse_unary(Parser* parser) {
         const size_t line = parser->tokens[parser->current_position].line;
         return create_unary_expr_node(line, parser->arena, right, op.type);
     }
-    return parse_primary(parser);
+    return parse_call(parser);
 }
 // Parses comparison
 ASTNode* parse_comparison(Parser* parser) {
@@ -247,6 +247,57 @@ ASTNode* parse_assignment(Parser* parser) {
         }
         report_parser_error(peek(parser), "Invalid assignment target.");
         return nullptr;
+    }
+
+    return expr;
+}
+
+ASTNode* finish_call(Parser* parser, ASTNode* callee) {
+    std::vector<ASTNode*> arguments;
+
+    if (peek(parser).type != TokenType::RIGHT_PAREN) {
+        do {
+            arguments.push_back(parse_assignment(parser));
+
+            if (peek(parser).type == TokenType::COMMA) {
+                advance(parser);
+            } else {
+                break;
+            }
+        } while (true);
+    }
+
+    const Token paren = peek(parser);
+    if (paren.type == TokenType::RIGHT_PAREN) {
+        advance(parser);
+    } else {
+        report_parser_error(peek(parser), "Expect ')' after arguments.");
+    }
+
+    ASTNode** arena_args = nullptr;
+    if (!arguments.empty()) {
+        void* memory = alloc_arena(parser->arena, sizeof(ASTNode*) * arguments.size());
+        arena_args = static_cast<ASTNode**>(memory);
+
+        for (size_t i = 0; i < arguments.size(); ++i) {
+            arena_args[i] = arguments[i];
+        }
+    }
+
+    return create_function_call_node(paren.line, parser->arena, callee, arena_args, arguments.size());
+}
+
+ASTNode* parse_call(Parser* parser) {
+
+    ASTNode* expr = parse_primary(parser);
+
+    while (true) {
+        if (peek(parser).type == TokenType::LEFT_PAREN) {
+            advance(parser); // Consume the '('
+            expr = finish_call(parser, expr);
+        } else {
+            break;
+        }
     }
 
     return expr;

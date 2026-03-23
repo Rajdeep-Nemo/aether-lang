@@ -382,5 +382,25 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
         // taking all local variables with it.
         return RuntimeValue{ValueType::VAL_NIL};
     }
+    if (node->node_type == NodeType::FUNCTION_CALL) {
+
+        RuntimeValue callee = evaluate(node->function_call.callee, env);
+
+        if (callee.type == ValueType::VAL_NIL) {
+            return RuntimeValue{ValueType::VAL_NIL};
+        }
+
+        if (callee.type != ValueType::VAL_NATIVE_FN) {
+            report_runtime_error(node->line, "Can only call functions.");
+            return RuntimeValue{ValueType::VAL_NIL};
+        }
+
+        std::vector<RuntimeValue> args;
+        for (size_t i = 0; i < node->function_call.arg_count; ++i) {
+            args.push_back(evaluate(node->function_call.arguments[i], env));
+        }
+
+        return callee.native(args, node->line);
+    }
     return RuntimeValue{ValueType::VAL_NIL};
 }

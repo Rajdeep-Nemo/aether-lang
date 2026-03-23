@@ -41,7 +41,7 @@ int main(const int argc, char* argv[]) {
         parser.current_position = 0;
         parser.arena = &start_arena;
         // Environment initialization
-        Environment global_env = new Environment();
+        Environment global_env;
 
         // 1. Register 'print'
         RuntimeValue print_fn{};

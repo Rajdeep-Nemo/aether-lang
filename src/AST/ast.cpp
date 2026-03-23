@@ -81,7 +81,7 @@ ASTNode* create_var_declaration_node(const size_t line, Arena* arena, const std:
     return node;
 }
 // Variable access node
-ASTNode* create_var_access_node(const size_t line, Arena* arena,const  std::string_view var_name) {
+ASTNode* create_var_access_node(const size_t line, Arena* arena, const std::string_view var_name) {
     void* memory = alloc_arena(arena, sizeof(ASTNode));
     auto* node = static_cast<ASTNode*>(memory);
     node->node_type = NodeType::VAR_ACCESS;
@@ -107,5 +107,16 @@ ASTNode* create_block_node(Arena* arena, ASTNode** statements,const  size_t coun
     node->line = line;
     node->block_statement.statements = statements;
     node->block_statement.count = count;
+    return node;
+}
+// Function call node
+ASTNode* create_function_call_node(size_t line, Arena* arena, ASTNode* callee, ASTNode** arguments, size_t arg_count) {
+    void* memory = alloc_arena(arena, sizeof(ASTNode));
+    auto* node = static_cast<ASTNode*>(memory);
+    node->node_type = NodeType::FUNCTION_CALL;
+    node->line = line;
+    node->function_call.callee = callee;
+    node->function_call.arguments = arguments;
+    node->function_call.arg_count = arg_count;
     return node;
 }

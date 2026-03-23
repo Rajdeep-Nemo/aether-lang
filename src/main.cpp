@@ -1,4 +1,5 @@
 #include "AST/ast.hpp"
+#include "Builtins/builtins.hpp"
 #include "Evaluator/evaluator.hpp"
 #include "Lexer/lexer.hpp"
 #include "Parser/parser.hpp"
@@ -19,6 +20,7 @@ int main(const int argc, char* argv[]) {
         return 1;
     }
     if (argc == 2) {
+        // Main start -----------------------------------------------------------------------------------------
         // First check
         if (!run_file(argv[1])) {
             return 1;
@@ -39,7 +41,20 @@ int main(const int argc, char* argv[]) {
         parser.current_position = 0;
         parser.arena = &start_arena;
         // Environment initialization
-        Environment global_env;
+        Environment global_env = new Environment();
+
+        // 1. Register 'print'
+        RuntimeValue print_fn{};
+        print_fn.type = ValueType::VAL_NATIVE_FN;
+        print_fn.native = builtin_print; // Point it to our C++ wrapper
+        global_env.define("print", print_fn);
+
+        // 2. Register 'println'
+        RuntimeValue println_fn{};
+        println_fn.type = ValueType::VAL_NATIVE_FN;
+        println_fn.native = builtin_println;
+        global_env.define("println", println_fn);
+
         // Execution
         while (!is_at_end(&parser)) {
             const ASTNode* root = parse(&parser);
@@ -52,13 +67,13 @@ int main(const int argc, char* argv[]) {
             }
             const RuntimeValue result = evaluate(root, &global_env);
             switch (result.type) {
-            case ValueType::VAL_INT:
+            case ValueType::VAL_I64:
                 std::cout << result.i << '\n';
                 break;
-            case ValueType::VAL_UINT:
+            case ValueType::VAL_U64:
                 std::cout << result.u << '\n';
                 break;
-            case ValueType::VAL_FLOAT:
+            case ValueType::VAL_F64:
                 std::cout << result.f << '\n';
                 break;
             case ValueType::VAL_STRING:
@@ -85,6 +100,7 @@ int main(const int argc, char* argv[]) {
         string_pool.clear();
         //-------------------------------------------------------------------------2
         return 0;
+        // Main end ------------------------------------------------------------------------------------------------------
     }
     if (argc > 2) {
         std::cout << "Too many arguments.\n";

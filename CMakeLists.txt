@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Library source files
 set(AETHER_LIB_SOURCES
     src/AST/ast.cpp
-    src/Builtins/builtin.cpp
+        src/Builtins/builtins.cpp
     src/Evaluator/evaluator.cpp
     src/Lexer/lexer.cpp
     src/Parser/parser.cpp

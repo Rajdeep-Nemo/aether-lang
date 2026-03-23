@@ -139,7 +139,7 @@ aether-lang/
 │   │   ├── ast.cpp         # Implementation of abstract syntax tree data structures
 │   │   └── ast.hpp         # Header defining AST node types and interfaces
 │   ├── Builtins/
-│   │   ├── builtin.cpp     # Implementation of built-in functions and operations
+│   │   ├── builtins.cpp     # Implementation of built-in functions and operations
 │   │   └── builtin.hpp     # Header for built-in function declarations
 │   ├── Interpreter/
 │   │   ├── evaluator.cpp # Core interpreter logic for executing Aether code

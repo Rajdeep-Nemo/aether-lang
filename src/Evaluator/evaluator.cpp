@@ -2,11 +2,11 @@
 #include "ast.hpp"
 #include "environment.hpp"
 #include "error.hpp"
-#include <vector>
-#include <string>
 #include <cstdint>
-//To be removed------------------------------------------1
-// Global pool to track dynamically allocated strings
+#include <string>
+#include <vector>
+// To be removed------------------------------------------1
+//  Global pool to track dynamically allocated strings
 std::vector<std::string*> string_pool;
 //-------------------------------------------------------1
 
@@ -22,36 +22,44 @@ RuntimeValue cast_with_bounds_check(RuntimeValue val, const DataType target_type
         const int64_t num = val.i;
 
         switch (target_type) {
-            // i8
-            case DataType::TYPE_I8:
-                if (num >= INT8_MIN && num <= INT8_MAX) {
-                    val.type = ValueType::VAL_I8;
-                    return val;
-                }
-                report_runtime_error(line, "Value out of bounds for i8.");
-            return RuntimeValue{ValueType::VAL_NIL};
-            // i16
-            case DataType::TYPE_I16:
-                if (num >= INT16_MIN && num <= INT16_MAX) {
-                    val.type = ValueType::VAL_I16;
-                    return val;
-                }
-                report_runtime_error(line, "Value out of bounds for i16.");
-            return RuntimeValue{ValueType::VAL_NIL};
-            // i32
-            case DataType::TYPE_I32:
-                if (num >= INT32_MIN && num <= INT32_MAX) { val.type = ValueType::VAL_I32; return val; }
-                report_runtime_error(line, "Value out of bounds for i32."); return RuntimeValue{ValueType::VAL_NIL};
-            // i64
-            case DataType::TYPE_I64:
+        // i8
+        case DataType::TYPE_I8:
+            if (num >= INT8_MIN && num <= INT8_MAX) {
+                val.type = ValueType::VAL_I8;
                 return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i8.");
+            return RuntimeValue{ValueType::VAL_NIL};
+        // i16
+        case DataType::TYPE_I16:
+            if (num >= INT16_MIN && num <= INT16_MAX) {
+                val.type = ValueType::VAL_I16;
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i16.");
+            return RuntimeValue{ValueType::VAL_NIL};
+        // i32
+        case DataType::TYPE_I32:
+            if (num >= INT32_MIN && num <= INT32_MAX) {
+                val.type = ValueType::VAL_I32;
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i32.");
+            return RuntimeValue{ValueType::VAL_NIL};
+        // i64
+        case DataType::TYPE_I64:
+            return val;
 
-            // UNSIGNED
-            case DataType::TYPE_U8: case DataType::TYPE_U16: case DataType::TYPE_U32: case DataType::TYPE_U64:
-                report_runtime_error(line, "Type mismatch: Cannot assign a negative signed value to an unsigned type.");
-                return RuntimeValue{ValueType::VAL_NIL};
+        // UNSIGNED
+        case DataType::TYPE_U8:
+        case DataType::TYPE_U16:
+        case DataType::TYPE_U32:
+        case DataType::TYPE_U64:
+            report_runtime_error(line, "Type mismatch: Cannot assign a negative signed value to an unsigned type.");
+            return RuntimeValue{ValueType::VAL_NIL};
 
-            default: break;
+        default:
+            break;
         }
     }
 
@@ -60,40 +68,73 @@ RuntimeValue cast_with_bounds_check(RuntimeValue val, const DataType target_type
         const uint64_t num = val.u;
 
         switch (target_type) {
-            // UNSIGNED
-            case DataType::TYPE_U8:
-                if (num <= UINT8_MAX) { val.type = ValueType::VAL_U8; return val; }
-                report_runtime_error(line, "Value out of bounds for u8."); return RuntimeValue{ValueType::VAL_NIL};
-
-            case DataType::TYPE_U16:
-                if (num <= UINT16_MAX) { val.type = ValueType::VAL_U16; return val; }
-                report_runtime_error(line, "Value out of bounds for u16."); return RuntimeValue{ValueType::VAL_NIL};
-
-            case DataType::TYPE_U32:
-                if (num <= UINT32_MAX) { val.type = ValueType::VAL_U32; return val; }
-                report_runtime_error(line, "Value out of bounds for u32."); return RuntimeValue{ValueType::VAL_NIL};
-
-            case DataType::TYPE_U64:
+        // UNSIGNED
+        case DataType::TYPE_U8:
+            if (num <= UINT8_MAX) {
+                val.type = ValueType::VAL_U8;
                 return val;
+            }
+            report_runtime_error(line, "Value out of bounds for u8.");
+            return RuntimeValue{ValueType::VAL_NIL};
 
-            // SIGNED (Must check positive limits!)
-            case DataType::TYPE_I8:
-                if (num <= INT8_MAX) { val.type = ValueType::VAL_I8; val.i = static_cast<int64_t>(num); return val; }
-                report_runtime_error(line, "Value out of bounds for i8."); return RuntimeValue{ValueType::VAL_NIL};
+        case DataType::TYPE_U16:
+            if (num <= UINT16_MAX) {
+                val.type = ValueType::VAL_U16;
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for u16.");
+            return RuntimeValue{ValueType::VAL_NIL};
 
-            case DataType::TYPE_I16:
-                if (num <= INT16_MAX) { val.type = ValueType::VAL_I16; val.i = static_cast<int64_t>(num); return val; }
-                report_runtime_error(line, "Value out of bounds for i16."); return RuntimeValue{ValueType::VAL_NIL};
+        case DataType::TYPE_U32:
+            if (num <= UINT32_MAX) {
+                val.type = ValueType::VAL_U32;
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for u32.");
+            return RuntimeValue{ValueType::VAL_NIL};
 
-            case DataType::TYPE_I32:
-                if (num <= INT32_MAX) { val.type = ValueType::VAL_I32; val.i = static_cast<int64_t>(num); return val; }
-                report_runtime_error(line, "Value out of bounds for i32."); return RuntimeValue{ValueType::VAL_NIL};
+        case DataType::TYPE_U64:
+            return val;
 
-            case DataType::TYPE_I64:
-                if (num <= INT64_MAX) { val.type = ValueType::VAL_I64; val.i = static_cast<int64_t>(num); return val; }
-                report_runtime_error(line, "Value out of bounds for i64."); return RuntimeValue{ValueType::VAL_NIL};
+        // SIGNED (Must check positive limits!)
+        case DataType::TYPE_I8:
+            if (num <= INT8_MAX) {
+                val.type = ValueType::VAL_I8;
+                val.i = static_cast<int64_t>(num);
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i8.");
+            return RuntimeValue{ValueType::VAL_NIL};
 
-            default: break;
+        case DataType::TYPE_I16:
+            if (num <= INT16_MAX) {
+                val.type = ValueType::VAL_I16;
+                val.i = static_cast<int64_t>(num);
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i16.");
+            return RuntimeValue{ValueType::VAL_NIL};
+
+        case DataType::TYPE_I32:
+            if (num <= INT32_MAX) {
+                val.type = ValueType::VAL_I32;
+                val.i = static_cast<int64_t>(num);
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i32.");
+            return RuntimeValue{ValueType::VAL_NIL};
+
+        case DataType::TYPE_I64:
+            if (num <= INT64_MAX) {
+                val.type = ValueType::VAL_I64;
+                val.i = static_cast<int64_t>(num);
+                return val;
+            }
+            report_runtime_error(line, "Value out of bounds for i64.");
+            return RuntimeValue{ValueType::VAL_NIL};
+
+        default:
+            break;
         }
     }
     // Floating point
@@ -109,12 +150,19 @@ RuntimeValue cast_with_bounds_check(RuntimeValue val, const DataType target_type
             return val;
 
         // Prevent implicit float-to-int truncation
-        case DataType::TYPE_I8: case DataType::TYPE_I16: case DataType::TYPE_I32: case DataType::TYPE_I64:
-        case DataType::TYPE_U8: case DataType::TYPE_U16: case DataType::TYPE_U32: case DataType::TYPE_U64:
+        case DataType::TYPE_I8:
+        case DataType::TYPE_I16:
+        case DataType::TYPE_I32:
+        case DataType::TYPE_I64:
+        case DataType::TYPE_U8:
+        case DataType::TYPE_U16:
+        case DataType::TYPE_U32:
+        case DataType::TYPE_U64:
             report_runtime_error(line, "Type mismatch: Cannot implicitly cast a float to an integer. Use explicit casting to truncate decimals.");
             return RuntimeValue{ValueType::VAL_NIL};
 
-        default: break;
+        default:
+            break;
         }
     }
 

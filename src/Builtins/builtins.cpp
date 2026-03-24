@@ -6,22 +6,35 @@
 
 // Helper 1: strictly match the string tag to the Aether ValueType
 bool match_tag(const std::string& tag, ValueType type) {
-    if (tag == "i8" && type == ValueType::VAL_I8) return true;
-    if (tag == "i16" && type == ValueType::VAL_I16) return true;
-    if (tag == "i32" && type == ValueType::VAL_I32) return true;
-    if (tag == "i64" && type == ValueType::VAL_I64) return true;
+    if (tag == "i8" && type == ValueType::VAL_I8)
+        return true;
+    if (tag == "i16" && type == ValueType::VAL_I16)
+        return true;
+    if (tag == "i32" && type == ValueType::VAL_I32)
+        return true;
+    if (tag == "i64" && type == ValueType::VAL_I64)
+        return true;
 
-    if (tag == "u8" && type == ValueType::VAL_U8) return true;
-    if (tag == "u16" && type == ValueType::VAL_U16) return true;
-    if (tag == "u32" && type == ValueType::VAL_U32) return true;
-    if (tag == "u64" && type == ValueType::VAL_U64) return true;
+    if (tag == "u8" && type == ValueType::VAL_U8)
+        return true;
+    if (tag == "u16" && type == ValueType::VAL_U16)
+        return true;
+    if (tag == "u32" && type == ValueType::VAL_U32)
+        return true;
+    if (tag == "u64" && type == ValueType::VAL_U64)
+        return true;
 
-    if (tag == "f32" && type == ValueType::VAL_F32) return true;
-    if (tag == "f64" && type == ValueType::VAL_F64) return true;
+    if (tag == "f32" && type == ValueType::VAL_F32)
+        return true;
+    if (tag == "f64" && type == ValueType::VAL_F64)
+        return true;
 
-    if (tag == "char" && type == ValueType::VAL_CHAR) return true;
-    if (tag == "string" && type == ValueType::VAL_STRING) return true;
-    if (tag == "bool" && type == ValueType::VAL_BOOLEAN) return true;
+    if (tag == "char" && type == ValueType::VAL_CHAR)
+        return true;
+    if (tag == "string" && type == ValueType::VAL_STRING)
+        return true;
+    if (tag == "bool" && type == ValueType::VAL_BOOLEAN)
+        return true;
 
     return false;
 }
@@ -29,33 +42,46 @@ bool match_tag(const std::string& tag, ValueType type) {
 // Helper 2: Print the raw data based on its type
 void print_raw_value(const RuntimeValue& val) {
     switch (val.type) {
-        // All signed integers use the 64-bit 'i' payload
-        case ValueType::VAL_I8: case ValueType::VAL_I16:
-        case ValueType::VAL_I32: case ValueType::VAL_I64:
-            std::cout << val.i; break;
+    // All signed integers use the 64-bit 'i' payload
+    case ValueType::VAL_I8:
+    case ValueType::VAL_I16:
+    case ValueType::VAL_I32:
+    case ValueType::VAL_I64:
+        std::cout << val.i;
+        break;
 
-        // All unsigned integers use the 64-bit 'u' payload
-        case ValueType::VAL_U8: case ValueType::VAL_U16:
-        case ValueType::VAL_U32: case ValueType::VAL_U64:
-            std::cout << val.u; break;
+    // All unsigned integers use the 64-bit 'u' payload
+    case ValueType::VAL_U8:
+    case ValueType::VAL_U16:
+    case ValueType::VAL_U32:
+    case ValueType::VAL_U64:
+        std::cout << val.u;
+        break;
 
-        case ValueType::VAL_F32: case ValueType::VAL_F64:
-            std::cout << val.f; break;
+    case ValueType::VAL_F32:
+    case ValueType::VAL_F64:
+        std::cout << val.f;
+        break;
 
-        case ValueType::VAL_CHAR:
-            std::cout << val.c; break;
+    case ValueType::VAL_CHAR:
+        std::cout << val.c;
+        break;
 
-        case ValueType::VAL_STRING:
-            std::cout << *(val.str_ptr); break;
+    case ValueType::VAL_STRING:
+        std::cout << *(val.str_ptr);
+        break;
 
-        case ValueType::VAL_BOOLEAN:
-            std::cout << (val.b ? "true" : "false"); break;
+    case ValueType::VAL_BOOLEAN:
+        std::cout << (val.b ? "true" : "false");
+        break;
 
-        case ValueType::VAL_NIL:
-            std::cout << "NIL"; break;
+    case ValueType::VAL_NIL:
+        std::cout << "NIL";
+        break;
 
-        default:
-            std::cout << "<unknown>"; break;
+    default:
+        std::cout << "<unknown>";
+        break;
     }
 }
 
@@ -63,7 +89,8 @@ RuntimeValue builtin_print(const std::vector<RuntimeValue>& args, size_t line) {
     RuntimeValue nil{};
     nil.type = ValueType::VAL_NIL;
 
-    if (args.empty()) return nil;
+    if (args.empty())
+        return nil;
 
     // If the first argument isn't a string, just print it normally (fallback)
     if (args[0].type != ValueType::VAL_STRING) {

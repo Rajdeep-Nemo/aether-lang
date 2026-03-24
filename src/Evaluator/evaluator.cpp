@@ -4,10 +4,122 @@
 #include "error.hpp"
 #include <vector>
 #include <string>
+#include <cstdint>
 //To be removed------------------------------------------1
 // Global pool to track dynamically allocated strings
 std::vector<std::string*> string_pool;
 //-------------------------------------------------------1
+
+// Implicit casting for variables from 64 bit to user desired bits
+RuntimeValue cast_with_bounds_check(RuntimeValue val, const DataType target_type, const size_t line) {
+    // Checks if it is a string
+    if (val.type != ValueType::VAL_I64 && val.type != ValueType::VAL_U64 && val.type != ValueType::VAL_F64) {
+        return val;
+    }
+
+    // Negative numbers
+    if (val.type == ValueType::VAL_I64) {
+        const int64_t num = val.i;
+
+        switch (target_type) {
+            // i8
+            case DataType::TYPE_I8:
+                if (num >= INT8_MIN && num <= INT8_MAX) {
+                    val.type = ValueType::VAL_I8;
+                    return val;
+                }
+                report_runtime_error(line, "Value out of bounds for i8.");
+            return RuntimeValue{ValueType::VAL_NIL};
+            // i16
+            case DataType::TYPE_I16:
+                if (num >= INT16_MIN && num <= INT16_MAX) {
+                    val.type = ValueType::VAL_I16;
+                    return val;
+                }
+                report_runtime_error(line, "Value out of bounds for i16.");
+            return RuntimeValue{ValueType::VAL_NIL};
+            // i32
+            case DataType::TYPE_I32:
+                if (num >= INT32_MIN && num <= INT32_MAX) { val.type = ValueType::VAL_I32; return val; }
+                report_runtime_error(line, "Value out of bounds for i32."); return RuntimeValue{ValueType::VAL_NIL};
+            // i64
+            case DataType::TYPE_I64:
+                return val;
+
+            // UNSIGNED
+            case DataType::TYPE_U8: case DataType::TYPE_U16: case DataType::TYPE_U32: case DataType::TYPE_U64:
+                report_runtime_error(line, "Type mismatch: Cannot assign a negative signed value to an unsigned type.");
+                return RuntimeValue{ValueType::VAL_NIL};
+
+            default: break;
+        }
+    }
+
+    // Positive numbers
+    else if (val.type == ValueType::VAL_U64) {
+        const uint64_t num = val.u;
+
+        switch (target_type) {
+            // UNSIGNED
+            case DataType::TYPE_U8:
+                if (num <= UINT8_MAX) { val.type = ValueType::VAL_U8; return val; }
+                report_runtime_error(line, "Value out of bounds for u8."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_U16:
+                if (num <= UINT16_MAX) { val.type = ValueType::VAL_U16; return val; }
+                report_runtime_error(line, "Value out of bounds for u16."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_U32:
+                if (num <= UINT32_MAX) { val.type = ValueType::VAL_U32; return val; }
+                report_runtime_error(line, "Value out of bounds for u32."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_U64:
+                return val;
+
+            // SIGNED (Must check positive limits!)
+            case DataType::TYPE_I8:
+                if (num <= INT8_MAX) { val.type = ValueType::VAL_I8; val.i = static_cast<int64_t>(num); return val; }
+                report_runtime_error(line, "Value out of bounds for i8."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_I16:
+                if (num <= INT16_MAX) { val.type = ValueType::VAL_I16; val.i = static_cast<int64_t>(num); return val; }
+                report_runtime_error(line, "Value out of bounds for i16."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_I32:
+                if (num <= INT32_MAX) { val.type = ValueType::VAL_I32; val.i = static_cast<int64_t>(num); return val; }
+                report_runtime_error(line, "Value out of bounds for i32."); return RuntimeValue{ValueType::VAL_NIL};
+
+            case DataType::TYPE_I64:
+                if (num <= INT64_MAX) { val.type = ValueType::VAL_I64; val.i = static_cast<int64_t>(num); return val; }
+                report_runtime_error(line, "Value out of bounds for i64."); return RuntimeValue{ValueType::VAL_NIL};
+
+            default: break;
+        }
+    }
+    // Floating point
+    else if (val.type == ValueType::VAL_F64) {
+        const double num = val.f;
+        switch (target_type) {
+        case DataType::TYPE_F64:
+            return val;
+
+        case DataType::TYPE_F32:
+            val.type = ValueType::VAL_F32;
+            val.f = static_cast<double>(static_cast<float>(num));
+            return val;
+
+        // Prevent implicit float-to-int truncation
+        case DataType::TYPE_I8: case DataType::TYPE_I16: case DataType::TYPE_I32: case DataType::TYPE_I64:
+        case DataType::TYPE_U8: case DataType::TYPE_U16: case DataType::TYPE_U32: case DataType::TYPE_U64:
+            report_runtime_error(line, "Type mismatch: Cannot implicitly cast a float to an integer. Use explicit casting to truncate decimals.");
+            return RuntimeValue{ValueType::VAL_NIL};
+
+        default: break;
+        }
+    }
+
+    return val;
+}
 
 RuntimeValue evaluate(const ASTNode* node, Environment* env) {
     if (node == nullptr) {
@@ -41,10 +153,17 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
         RuntimeValue val{};
         val.type = ValueType::VAL_STRING;
 
-        auto new_str = new std::string(node->string_literal.value);
-        // Add it to our garbage collection pool
-        string_pool.push_back(new_str);
+        std::string_view raw_view = node->string_literal.value;
 
+        // Strip the leading and trailing double quotes
+        if (raw_view.length() >= 2 && raw_view.front() == '"' && raw_view.back() == '"') {
+            raw_view = raw_view.substr(1, raw_view.length() - 2);
+        }
+
+        auto new_str = new std::string(raw_view);
+        // To be removed -------------------------------------2
+        string_pool.push_back(new_str);
+        // to be removed -------------------------------------2
         val.str_ptr = new_str;
         return val;
     }
@@ -341,25 +460,44 @@ RuntimeValue evaluate(const ASTNode* node, Environment* env) {
             return neg;
         }
         if (right.type == ValueType::VAL_U64) {
-            report_runtime_error(node->line, "Cannot apply unary minus to an unsigned integer.");
+            // The absolute maximum absolute value for an i64 is 9223372036854775808
+            if (right.u == 9223372036854775808ULL) {
+                RuntimeValue neg{};
+                neg.type = ValueType::VAL_I64;
+                neg.i = INT64_MIN;
+                return neg;
+            }
+            if (right.u < 9223372036854775808ULL) {
+                RuntimeValue neg{};
+                neg.type = ValueType::VAL_I64;
+                neg.i = -static_cast<int64_t>(right.u);
+                return neg;
+            }
+            report_runtime_error(node->line, "Value too large to become a negative number.");
             return RuntimeValue{ValueType::VAL_NIL};
         }
     }
     if (node->node_type == NodeType::VAR_DECLARATION) {
         RuntimeValue val{};
-
         // If initialized (e.g., let x: i32 = 5;)
         if (node->var_declaration.value != nullptr) {
             val = evaluate(node->var_declaration.value, env);
+            // Checking happens only if a type is provided
+            if (node->var_declaration.type_annotation != DataType::TYPE_UNKNOWN) {
+                // Uses the cast function with bounds checking
+                val = cast_with_bounds_check(val, node->var_declaration.type_annotation, node->line);
+                // If NIL, means out of bounds error
+                if (val.type == ValueType::VAL_NIL) {
+                    return val;
+                }
+            }
         }
         // If not (e.g., let x: i32;) assign NIL
         else {
             val.type = ValueType::VAL_NIL;
         }
-
         // Saves it to memory! (Convert string_view to string for the unordered_map key)
         env->define(std::string(node->var_declaration.var_name), val);
-
         // Statements don't evaluate to a mathematical number, so returns NIL
         return RuntimeValue{ValueType::VAL_NIL};
     }

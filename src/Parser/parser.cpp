@@ -91,7 +91,7 @@ ASTNode* parse_primary(Parser* parser) {
 
     if (current.type == TokenType::INT_LITERAL) {
         advance(parser);
-        return create_int_node(current.line, parser->arena, std::stoll(current.lexeme));
+        return create_uint_node(current.line, parser->arena, std::strtoull(current.lexeme.c_str(), nullptr, 10));
     }
     if (current.type == TokenType::FLOAT_LITERAL) {
         advance(parser);
